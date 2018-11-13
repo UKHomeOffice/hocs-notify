@@ -2,14 +2,14 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: hocs-casework
+  name: hocs-audit
   labels:
     version: {{.VERSION}}
 spec:
   replicas: {{.REPLICAS}}
   selector:
     matchLabels:
-      name: hocs-casework
+      name: hocs-audit
   strategy:
     rollingUpdate:
       maxUnavailable: 0
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       labels:
-        name: hocs-casework
+        name: hocs-audit
         role: hocs-backend
         version: {{.VERSION}}
     spec:
@@ -36,7 +36,7 @@ spec:
           args:
             - --certs=/certs
             - --command=/usr/bin/create-keystore.sh /certs/tls.pem /certs/tls-key.pem /etc/ssl/certs/acp-root.crt
-            - --domain=hocs-casework.${KUBE_NAMESPACE}.svc.cluster.local
+            - --domain=hocs-audit.${KUBE_NAMESPACE}.svc.cluster.local
             - --domain=localhost
             - --onetime=true
           env:
@@ -63,7 +63,7 @@ spec:
                 - SETGID
           args:
             - --certs=/certs
-            - --domain=hocs-casework.${KUBE_NAMESPACE}.svc.cluster.local
+            - --domain=hocs-audit.${KUBE_NAMESPACE}.svc.cluster.local
             - --expiry=8760h
             - --command=/usr/local/scripts/trigger_nginx_reload.sh
           env:
@@ -126,8 +126,8 @@ spec:
           ports:
             - name: https
               containerPort: 10443
-        - name: hocs-casework
-          image: quay.io/ukhomeofficedigital/hocs-casework:{{.VERSION}}
+        - name: hocs-audit
+          image: quay.io/ukhomeofficedigital/hocs-audit:{{.VERSION}}
           imagePullPolicy: Always
           securityContext:
             runAsNonRoot: true
@@ -166,7 +166,7 @@ spec:
                   key: db_name
             - name: DB_SCHEMA_NAME
               value:
-                'cs_casework_post_wr_002'
+                'cs_audit_001'
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -177,11 +177,6 @@ spec:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-rds
                   key: password
-            - name: CASE_QUEUE_NAME
-              value: {{.KUBE_NAMESPACE}}-case-sqs
-            - name: CASE_DLQ_NAME
-              value: {{.KUBE_NAMESPACE}}-case-sqs-dlq
-            - name: AWS_SQS_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-case-sqs
