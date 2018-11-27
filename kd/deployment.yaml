@@ -177,14 +177,19 @@ spec:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-rds
                   key: password
+            - name: CASE_QUEUE_NAME
+              value: {{.KUBE_NAMESPACE}}-reporting-sqs
+            - name: CASE_DLQ_NAME
+              value: {{.KUBE_NAMESPACE}}-reporting-sqs-dlq
+            - name: AWS_SQS_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-case-sqs
+                  name: {{.KUBE_NAMESPACE}}-reporting-sqs
                   key: access_key_id
             - name: AWS_SQS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-case-sqs
+                  name: {{.KUBE_NAMESPACE}}-reporting-sqs
                   key: secret_access_key
           resources:
             limits:
