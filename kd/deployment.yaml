@@ -179,7 +179,7 @@ spec:
                   key: password
             - name: AUDIT_QUEUE_NAME
               value: {{.KUBE_NAMESPACE}}-reporting-sqs
-            - name: AUDIT_DLQ_NAME
+            - name: AUDIT_QUEUE_DLQ_NAME
               value: {{.KUBE_NAMESPACE}}-reporting-sqs-dlq
             - name: AWS_SQS_ACCESS_KEY
               valueFrom:
