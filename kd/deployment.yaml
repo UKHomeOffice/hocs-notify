@@ -177,9 +177,9 @@ spec:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-rds
                   key: password
-            - name: CASE_QUEUE_NAME
+            - name: AUDIT_QUEUE_NAME
               value: {{.KUBE_NAMESPACE}}-reporting-sqs
-            - name: CASE_DLQ_NAME
+            - name: AUDIT_DLQ_NAME
               value: {{.KUBE_NAMESPACE}}-reporting-sqs-dlq
             - name: AWS_SQS_ACCESS_KEY
               valueFrom:
