@@ -203,30 +203,30 @@ spec:
           ports:
             - name: http
               containerPort: 8080
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
-              httpHeaders:
-                - name: X-probe
-                  value: kubelet
-            initialDelaySeconds: 110
-            periodSeconds: 20
-            timeoutSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: http
-              httpHeaders:
-                - name: X-probe
-                  value: kubelet
-            initialDelaySeconds: 130
-            periodSeconds: 20
-            timeoutSeconds: 10
-          volumeMounts:
-            - mountPath: /etc/keystore
-              name: keystore
-              readOnly: true
+#          livenessProbe:
+#            httpGet:
+#              path: /actuator/health
+#              port: http
+#              httpHeaders:
+#                - name: X-probe
+#                  value: kubelet
+#            initialDelaySeconds: 110
+#            periodSeconds: 20
+#            timeoutSeconds: 10
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health
+#              port: http
+#              httpHeaders:
+#                - name: X-probe
+#                  value: kubelet
+#            initialDelaySeconds: 130
+#            periodSeconds: 20
+#            timeoutSeconds: 10
+#          volumeMounts:
+#            - mountPath: /etc/keystore
+#              name: keystore
+#              readOnly: true
       volumes:
         - name: keystore
           emptyDir:
