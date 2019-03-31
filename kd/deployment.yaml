@@ -166,7 +166,7 @@ spec:
                   key: db_name
             - name: DB_SCHEMA_NAME
               value:
-                'cs_audit_searvice'
+                'cs_audit_service'
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
