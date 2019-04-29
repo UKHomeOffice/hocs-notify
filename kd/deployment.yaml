@@ -64,17 +64,17 @@ spec:
             - name: DB_HOSTNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: endpoint
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: db_name
             - name: ROOT_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: password
             - name: DB_SCHEMA_NAME
               valueFrom:
@@ -201,31 +201,33 @@ spec:
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: endpoint
             - name: DB_PORT
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: port
             - name: DB_NAME
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
+                  name: {{.KUBE_NAMESPACE}}-rds-audit
                   key: db_name
             - name: DB_SCHEMA_NAME
-              value:
-                'cs_audit_service'
+              valueFrom:
+                secretKeyRef:
+                  name: hocs-audit
+                  key: rds_schema
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
-                  key: username
+                  name: hocs-audit
+                  key: rds_user
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds
-                  key: password
+                  name: hocs-audit
+                  key: rds_password
             - name: AUDIT_QUEUE_NAME
               value: {{.KUBE_NAMESPACE}}-audit-sqs
             - name: AUDIT_QUEUE_DLQ_NAME
