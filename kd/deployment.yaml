@@ -242,6 +242,13 @@ spec:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-audit-sqs
                   key: secret_access_key
+            - name: HOCS_INFO_SERVICE
+              value: 'https://hocs-info-service.{{.KUBE_NAMESPACE}}.svc.cluster.local'
+            - name: HOCS_BASICAUTH
+              valueFrom:
+                secretKeyRef:
+                  name: ui-casework-creds
+                  key: plaintext
           resources:
             limits:
               cpu: 850m
