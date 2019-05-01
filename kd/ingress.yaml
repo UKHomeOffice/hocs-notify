@@ -22,8 +22,8 @@ spec:
       - backend:
           serviceName: hocs-frontend
           servicePort: 443
-        path: /   
+        path: /
   tls:
   - hosts:
     - {{.DOMAIN_NAME}}
-    secretName: hocs-frontend-external-tls
+    secretName: hocs-export-external-tls

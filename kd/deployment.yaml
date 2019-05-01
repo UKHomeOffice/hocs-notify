@@ -102,6 +102,48 @@ spec:
                   name: hocs-db-readonly
                   key: rds_password      
       containers:
+        - name: keycloak-proxy
+          image: quay.io/ukhomeofficedigital/go-keycloak-proxy:v2.3.0
+          imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+          resources:
+          limits:
+            memory: "128Mi"
+            cpu: 100m
+          requests:
+            memory: "64Mi"
+            cpu: 50m
+          args:
+            - --config=/etc/secrets/data.yml
+            - --discovery-url={{.KC_REALM}}
+            - --openid-provider-proxy=http://hocs-outbound-proxy.{{.KUBE_NAMESPACE}}.svc.cluster.local:31290
+            - --listen=127.0.0.1:8081
+            - --enable-logging=true
+            - --enable-json-logging=true
+            - --upstream-url=http://127.0.0.1:8080
+            - --upstream-response-header-timeout=60s
+            - --upstream-expect-continue-timeout=60s
+            - --upstream-keepalive-timeout=60s
+            - --server-read-timeout=60s
+            - --server-write-timeout=60s
+            - --no-redirects=false
+            - --redirection-url=https://{{.DOMAIN_NAME}}
+            - --cors-origins='*'
+            - --secure-cookie=true
+            - --http-only-cookie=true
+            - --revocation-url={{.KC_REALM}}/protocol/openid-connect/logout
+            - --enable-logout-redirect=true
+            - --enable-default-deny=true
+            - --resources="uri=/*|roles=EXPORT_USER"
+            - --verbose
+          ports:
+            - name: keycloak-http
+              containerPort: 8081
+          volumeMounts:
+            - mountPath: /etc/secrets
+              name: frontend-keycloak-secret
+              readOnly: true
         - name: certs
           image: quay.io/ukhomeofficedigital/cfssl-sidekick:v0.0.6
           securityContext:
@@ -146,8 +188,14 @@ spec:
           env:
             - name: PROXY_SERVICE_HOST
               value: '127.0.0.1'
-            - name: PROXY_SERVICE_PORT
+            - name: PROXY_SERVICE_PORT_1
               value: '8080'
+            - name: PROXY_SERVICE_HOST_2
+              value: '127.0.0.1'
+            - name: PROXY_SERVICE_PORT_2
+              value: '8081'
+            - name: LOCATIONS_CSV
+              value: '/, /export/'
             - name: NAXSI_USE_DEFAULT_RULES
               value: 'FALSE'
             - name: ENABLE_UUID_PARAM
