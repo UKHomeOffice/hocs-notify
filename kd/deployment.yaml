@@ -108,12 +108,12 @@ spec:
           securityContext:
             runAsNonRoot: true
           resources:
-          limits:
-            memory: "128Mi"
-            cpu: 100m
-          requests:
-            memory: "64Mi"
-            cpu: 50m
+            limits:
+              memory: "128Mi"
+              cpu: 100m
+            requests:
+              memory: "64Mi"
+              cpu: 50m
           args:
             - --config=/etc/secrets/data.yml
             - --discovery-url={{.KC_REALM}}
