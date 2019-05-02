@@ -40,3 +40,4 @@ kd --insecure-skip-tls-verify \
    --timeout 10m \
     -f deployment.yaml \
     -f service.yaml
+    -f ingress.yaml

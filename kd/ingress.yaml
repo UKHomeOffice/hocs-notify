@@ -1,0 +1,29 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/secure-backends: "true"
+    ingress.kubernetes.io/backend-protocol: "HTTPS"
+    kubernetes.io/ingress.class: nginx-external
+    stable.k8s.psg.io/kcm.provider: http
+    ingress.kubernetes.io/proxy-buffer-size: 128k
+    ingress.kubernetes.io/server-snippets: |
+      client_header_buffer_size     8k;
+      large_client_header_buffers   4 128k;
+  labels:
+    stable.k8s.psg.io/kcm.class: default
+  name: hocs-export
+spec:
+  rules:
+  - host: {{.DOMAIN_NAME}}
+    http:
+      paths:
+      - backend:
+          serviceName: hocs-frontend
+          servicePort: 443
+        path: /
+  tls:
+  - hosts:
+    - {{.DOMAIN_NAME}}
+    secretName: hocs-export-external-tls
