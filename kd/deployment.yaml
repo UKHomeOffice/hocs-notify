@@ -347,3 +347,6 @@ spec:
         - name: auth-secrets
           secret:
             secretName: ui-casework-creds
+        - name: frontend-keycloak-secret
+          secret:
+            secretName: frontend-keycloak-secret
