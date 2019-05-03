@@ -20,7 +20,7 @@ spec:
     http:
       paths:
       - backend:
-          serviceName: hocs-frontend
+          serviceName: hocs-audit
           servicePort: 443
         path: /
   tls:
