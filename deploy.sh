@@ -38,7 +38,7 @@ if [ "${ENVIRONMENT}" == "prod" ] ; then
     export DNS_PREFIX=export.cs
     export KC_REALM=https://sso-dev.notprod.homeoffice.gov.uk/auth/realms/hocs-notprod
 else
-    export DNS_PREFIX=${ENVIRONMENT}.export.cs-notprod
+    export DNS_PREFIX=${ENVIRONMENT}-export.cs-notprod
     export KC_REALM=https://sso-dev.notprod.homeoffice.gov.uk/auth/realms/hocs-notprod
 fi
 
@@ -56,5 +56,5 @@ cd kd
 kd --insecure-skip-tls-verify \
    --timeout 10m \
     -f deployment.yaml \
-    -f service.yaml #\
-    #-f ingress.yaml
+    -f service.yaml \
+    -f ingress.yaml
