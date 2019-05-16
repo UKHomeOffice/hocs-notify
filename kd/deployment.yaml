@@ -135,7 +135,9 @@ spec:
             - --revocation-url={{.KC_REALM}}/protocol/openid-connect/logout
             - --enable-logout-redirect=true
             - --enable-default-deny=true
-            - --resources=uri=/*|roles=EXPORT_USER
+            - --resources=uri=/export/MIN*|roles=DCU_EXPORT_USER
+            - --resources=uri=/export/TRO*|roles=DCU_EXPORT_USER
+            - --resources=uri=/export/TRO*|roles=DCU_EXPORT_USER
             - --verbose
           ports:
             - name: keycloak-http
