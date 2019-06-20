@@ -75,7 +75,7 @@ pipeline:
       - VERSION=build-${DRONE_BUILD_NUMBER}
       - KUBE_SERVER=https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
     secrets:
-      - hocs_email_dev
+      - hocs_notify_dev
     commands:
       - cd kube-hocs-notify
       - ./deploy.sh
@@ -90,8 +90,8 @@ pipeline:
       - ENVIRONMENT=${DRONE_DEPLOY_TO}
       - KUBE_SERVER=https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
     secrets:
-      - hocs_email_dev
-      - hocs_email_demo
+      - hocs_notify_dev
+      - hocs_notify_demo
     commands:
       - cd kube-hocs-notify
       - ./deploy.sh
@@ -106,7 +106,7 @@ pipeline:
       - ENVIRONMENT=qa
       - KUBE_SERVER=https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
     secrets:
-      - hocs_email_qa
+      - hocs_notify_qa
     commands:
       - source version.txt
       - echo $VERSION
@@ -123,7 +123,7 @@ pipeline:
       - ENVIRONMENT=prod
       - KUBE_SERVER=https://kube-api-prod.prod.acp.homeoffice.gov.uk
     secrets:
-      - hocs_email_prod
+      - hocs_notify_prod
     commands:
       - cd kube-hocs-notify
       - ./deploy.sh

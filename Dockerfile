@@ -1,10 +1,10 @@
 FROM quay.io/ukhomeofficedigital/openjdk11
 
 
-ENV USER user_hocs_email
+ENV USER user_hocs_notify
 ENV USER_ID 1000
-ENV GROUP group_hocs_email
-ENV NAME hocs-email
+ENV GROUP group_hocs_notify
+ENV NAME hocs-notify
 ENV JAR_PATH build/libs
 
 RUN yum update -y glibc && \

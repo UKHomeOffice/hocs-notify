@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HocsEmailServiceApplication {
+public class HocsNotifyServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HocsEmailServiceApplication.class, args);
+		SpringApplication.run(HocsNotifyServiceApplication.class, args);
 	}
 
 }

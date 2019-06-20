@@ -56,10 +56,10 @@ public class NotifyConsumer extends RouteBuilder {
 
         from(fromQueue).routeId("notify-queue")
                 .setProperty(SqsConstants.RECEIPT_HANDLE, header(SqsConstants.RECEIPT_HANDLE))
-                .log(LoggingLevel.INFO,"Email Command Received")
+                .log(LoggingLevel.INFO,"Notify Command Received")
                 .log(LoggingLevel.DEBUG,"Body: ${body}")
                 .unmarshal().json(JsonLibrary.Jackson, NotifyCommand.class)
-                .log(LoggingLevel.DEBUG,"Email Command Unmarshalled")
+                .log(LoggingLevel.DEBUG,"Notify Command Unmarshalled")
                 .bean(notifyDomain, "executeCommand")
                 .log(LoggingLevel.INFO,"Command processed")
                 .setHeader(SqsConstants.RECEIPT_HANDLE, exchangeProperty(SqsConstants.RECEIPT_HANDLE));
