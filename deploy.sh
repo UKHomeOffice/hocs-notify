@@ -8,21 +8,21 @@ if [[ -z ${VERSION} ]] ; then
 fi
 
 if [[ ${ENVIRONMENT} == "prod" ]] ; then
-    echo "deploy ${VERSION} to PROD namespace, using HOCS_AUDIT_PROD drone secret"
-    export KUBE_TOKEN=${HOCS_AUDIT_PROD}
-    export REPLICAS="2"
+    echo "deploy ${VERSION} to PROD namespace, using HOCS_NOTIFY_PROD drone secret"
+    export KUBE_TOKEN=${HOCS_NOTIFY_PROD}
+    export REPLICAS="1"
 else
     if [[ ${ENVIRONMENT} == "qa" ]] ; then
-        echo "deploy ${VERSION} to QA namespace, using HOCS_AUDIT_QA drone secret"
-        export KUBE_TOKEN=${HOCS_AUDIT_QA}
-        export REPLICAS="2"
+        echo "deploy ${VERSION} to QA namespace, using HOCS_NOTIFY_QA drone secret"
+        export KUBE_TOKEN=${HOCS_NOTIFY_QA}
+        export REPLICAS="1"
     elif [[ ${ENVIRONMENT} == "demo" ]] ; then
-        echo "deploy ${VERSION} to DEMO namespace, using HOCS_AUDIT_DEMO drone secret"
-        export KUBE_TOKEN=${HOCS_AUDIT_DEMO}
+        echo "deploy ${VERSION} to DEMO namespace, using HOCS_NOTIFY_DEMO drone secret"
+        export KUBE_TOKEN=${HOCS_NOTIFY_DEMO}
         export REPLICAS="1"
     elif [[ ${ENVIRONMENT} == "dev" ]] ; then
-        echo "deploy ${VERSION} to DEV namespace, using HOCS_AUDIT_DEV drone secret"
-        export KUBE_TOKEN=${HOCS_AUDIT_DEV}
+        echo "deploy ${VERSION} to DEV namespace, using HOCS_NOTIFY_DEV drone secret"
+        export KUBE_TOKEN=${HOCS_NOTIFY_DEV}
         export REPLICAS="1"        
     else
         echo "Unable to find environment: ${ENVIRONMENT}"
@@ -33,21 +33,6 @@ if [[ -z ${KUBE_TOKEN} ]] ; then
     echo "Failed to find a value for KUBE_TOKEN - exiting"
     exit -1
 fi
-
-if [ "${ENVIRONMENT}" == "prod" ] ; then	
-    export KC_REALM=https://sso.digital.homeoffice.gov.uk/auth/realms/hocs-prod	
-else	
-    export KC_REALM=https://sso-dev.notprod.homeoffice.gov.uk/auth/realms/hocs-notprod	
-fi	
-
- export DOMAIN_NAME=${DNS_PREFIX}.homeoffice.gov.uk	
-
- echo	
-echo "Deploying hocs-frontend to ${ENVIRONMENT}"	
-echo "Keycloak realm: ${KC_REALM}"	
-echo "Keycloak domain: ${KC_DOMAIN}"	
-echo "domain name: ${DOMAIN_NAME}"	
-echo
 
 cd kd
 
