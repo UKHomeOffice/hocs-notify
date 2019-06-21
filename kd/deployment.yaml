@@ -2,14 +2,14 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: hocs-audit
+  name: hocs-notify
   labels:
     version: {{.VERSION}}
 spec:
   replicas: {{.REPLICAS}}
   selector:
     matchLabels:
-      name: hocs-audit
+      name: hocs-notify
   strategy:
     rollingUpdate:
       maxUnavailable: 0
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       labels:
-        name: hocs-audit
+        name: hocs-notify
         role: hocs-backend
         version: {{.VERSION}}
     spec:
@@ -36,7 +36,7 @@ spec:
           args:
             - --certs=/certs
             - --command=/usr/bin/create-keystore.sh /certs/tls.pem /certs/tls-key.pem /etc/ssl/certs/acp-root.crt
-            - --domain=hocs-audit.${KUBE_NAMESPACE}.svc.cluster.local
+            - --domain=hocs-notify.${KUBE_NAMESPACE}.svc.cluster.local
             - --domain=localhost
             - --onetime=true
           env:
@@ -52,125 +52,7 @@ spec:
             - name: bundle
               mountPath: /etc/ssl/certs
               readOnly: true
-        - name: db-initialise
-          image: docker.digital.homeoffice.gov.uk/hocs-db-provision:latest
-          securityContext:
-            runAsNonRoot: true
-            capabilities:
-              drop:
-                - SETUID
-                - SETGID
-          env:
-            - name: DB_HOSTNAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: endpoint
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: db_name
-            - name: ROOT_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: password
-            - name: DB_SCHEMA_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_schema
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_user
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_password
-            - name: DB_READONLY_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-db-readonly
-                  key: rds_user
-            - name: DB_READONLY_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-db-readonly
-                  key: rds_password      
       containers:
-        - name: keycloak-proxy
-          image: quay.io/ukhomeofficedigital/go-keycloak-proxy:v2.3.0
-          imagePullPolicy: Always
-          securityContext:
-            runAsNonRoot: true
-          resources:
-            limits:
-              memory: "128Mi"
-              cpu: 100m
-            requests:
-              memory: "64Mi"
-              cpu: 50m
-          args:
-            - --config=/etc/secrets/data.yml
-            - --discovery-url={{.KC_REALM}}
-            - --openid-provider-proxy=http://hocs-outbound-proxy.{{.KUBE_NAMESPACE}}.svc.cluster.local:31290
-            - --listen=127.0.0.1:8081
-            - --enable-logging=true
-            - --enable-json-logging=true
-            - --upstream-url=http://127.0.0.1:8080
-            - --upstream-response-header-timeout=60s
-            - --upstream-expect-continue-timeout=60s
-            - --upstream-keepalive-timeout=60s
-            - --server-read-timeout=60s
-            - --server-write-timeout=60s
-            - --no-redirects=false
-            - --redirection-url=https://{{.DOMAIN_NAME}}
-            - --cors-origins='*'
-            - --secure-cookie=true
-            - --http-only-cookie=true
-            - --revocation-url={{.KC_REALM}}/protocol/openid-connect/logout
-            - --enable-logout-redirect=true
-            - --enable-default-deny=true
-            - --resources=uri=/export/MIN*|roles=DCU_EXPORT_USER
-            - --resources=uri=/export/TRO*|roles=DCU_EXPORT_USER
-            - --resources=uri=/export/TRO*|roles=DCU_EXPORT_USER
-            - --verbose
-          ports:
-            - name: keycloak-http
-              containerPort: 8081
-          volumeMounts:
-            - mountPath: /etc/secrets
-              name: frontend-keycloak-secret
-              readOnly: true
-        - name: certs
-          image: quay.io/ukhomeofficedigital/cfssl-sidekick:v0.0.6
-          securityContext:
-            runAsNonRoot: true
-            capabilities:
-              drop:
-                - SETUID
-                - SETGID
-          args:
-            - --certs=/certs
-            - --domain=hocs-audit.${KUBE_NAMESPACE}.svc.cluster.local
-            - --expiry=8760h
-            - --command=/usr/local/scripts/trigger_nginx_reload.sh
-          env:
-            - name: KUBE_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          volumeMounts:
-            - name: certs
-              mountPath: /certs
-            - name: bundle
-              mountPath: /etc/ssl/certs
-              readOnly: true
-
         - name: proxy
           image: quay.io/ukhomeofficedigital/nginx-proxy:v3.4.12
           imagePullPolicy: Always
@@ -188,16 +70,10 @@ spec:
               memory: 256Mi
               cpu: 150m
           env:
-            - name: PROXY_SERVICE_HOST_1
+            - name: PROXY_SERVICE_HOST
               value: '127.0.0.1'
-            - name: PROXY_SERVICE_PORT_1
+            - name: PROXY_SERVICE_PORT
               value: '8080'
-            - name: PROXY_SERVICE_HOST_2
-              value: '127.0.0.1'
-            - name: PROXY_SERVICE_PORT_2
-              value: '8081'
-            - name: LOCATIONS_CSV
-              value: '/, /export/'
             - name: NAXSI_USE_DEFAULT_RULES
               value: 'FALSE'
             - name: ENABLE_UUID_PARAM
@@ -226,7 +102,7 @@ spec:
             - name: https
               containerPort: 10443
         - name: hocs-audit
-          image: quay.io/ukhomeofficedigital/hocs-audit:{{.VERSION}}
+          image: quay.io/ukhomeofficedigital/hocs-notify:{{.VERSION}}
           imagePullPolicy: Always
           securityContext:
             runAsNonRoot: true
@@ -248,49 +124,19 @@ spec:
               value: 'false'
             - name: SPRING_PROFILES_ACTIVE
               value: 'sqs'
-            - name: DB_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: endpoint
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: port
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-rds-audit
-                  key: db_name
-            - name: DB_SCHEMA_NAME
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_schema
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_user
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: hocs-audit
-                  key: rds_password
-            - name: AUDIT_QUEUE_NAME
-              value: {{.KUBE_NAMESPACE}}-audit-sqs
-            - name: AUDIT_QUEUE_DLQ_NAME
-              value: {{.KUBE_NAMESPACE}}-audit-sqs-dlq
+            - name: NOTIFY_QUEUE_NAME
+              value: {{.KUBE_NAMESPACE}}-notify-sqs
+            - name: NOTIFY_QUEUE_DLQ_NAME
+              value: {{.KUBE_NAMESPACE}}-notify-sqs-dlq
             - name: AWS_SQS_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-audit-sqs
+                  name: {{.KUBE_NAMESPACE}}-notify-sqs
                   key: access_key_id
             - name: AWS_SQS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{.KUBE_NAMESPACE}}-audit-sqs
+                  name: {{.KUBE_NAMESPACE}}-notify-sqs
                   key: secret_access_key
             - name: HOCS_INFO_SERVICE
               value: 'https://hocs-info-service.{{.KUBE_NAMESPACE}}.svc.cluster.local'
@@ -349,6 +195,3 @@ spec:
         - name: auth-secrets
           secret:
             secretName: ui-casework-creds
-        - name: frontend-keycloak-secret
-          secret:
-            secretName: frontend-keycloak-secret
