@@ -101,7 +101,7 @@ spec:
           ports:
             - name: https
               containerPort: 10443
-        - name: hocs-audit
+        - name: hocs-notify
           image: quay.io/ukhomeofficedigital/hocs-notify:{{.VERSION}}
           imagePullPolicy: Always
           securityContext:
