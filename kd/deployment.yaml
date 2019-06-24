@@ -128,12 +128,12 @@ spec:
               value: {{.KUBE_NAMESPACE}}-notify-sqs
             - name: NOTIFY_QUEUE_DLQ_NAME
               value: {{.KUBE_NAMESPACE}}-notify-sqs-dlq
-            - name: AWS_SQS_ACCESS_KEY
+            - name: NOTIFY_AWS_SQS_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-notify-sqs
                   key: access_key_id
-            - name: AWS_SQS_SECRET_KEY
+            - name: NOTIFY_AWS_SQS_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{.KUBE_NAMESPACE}}-notify-sqs
