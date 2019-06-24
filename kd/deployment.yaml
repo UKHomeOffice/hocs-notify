@@ -53,6 +53,30 @@ spec:
               mountPath: /etc/ssl/certs
               readOnly: true
       containers:
+        - name: certs
+          image: quay.io/ukhomeofficedigital/cfssl-sidekick:v0.0.6
+          securityContext:
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - SETUID
+                - SETGID
+          args:
+            - --certs=/certs
+            - --domain=hocs-docs.${KUBE_NAMESPACE}.svc.cluster.local
+            - --expiry=8760h
+            - --command=/usr/local/scripts/trigger_nginx_reload.sh
+          env:
+            - name: KUBE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: certs
+              mountPath: /certs
+            - name: bundle
+              mountPath: /etc/ssl/certs
+              readOnly: true
         - name: proxy
           image: quay.io/ukhomeofficedigital/nginx-proxy:v3.4.12
           imagePullPolicy: Always
@@ -80,7 +104,7 @@ spec:
               value: 'FALSE'
             - name: HTTPS_REDIRECT
               value: 'FALSE'
-            - name: BASIC_AUTH_1
+            - name: BASIC_AUTH
               value: /etc/nginx/authsecrets/htpasswd
             - name: SERVER_CERT
               value: /certs/tls.pem
@@ -172,7 +196,7 @@ spec:
               httpHeaders:
                 - name: X-probe
                   value: kubelet
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 20
             timeoutSeconds: 10
           readinessProbe:
@@ -182,7 +206,7 @@ spec:
               httpHeaders:
                 - name: X-probe
                   value: kubelet
-            initialDelaySeconds: 60
+            initialDelaySeconds: 30
             periodSeconds: 20
             timeoutSeconds: 10
           volumeMounts:
