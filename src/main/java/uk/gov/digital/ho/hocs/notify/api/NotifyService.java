@@ -63,7 +63,8 @@ public class NotifyService {
                 sendUnAllocateUserEmail(caseUUID, stageUUID, currentUserUUID, caseReference);
             }
         } catch (Exception e) {
-            log.warn("Email failed to send Case: {} Stage: {} CurrentUser: {} NewUser:{}", caseReference, stageUUID, currentUserUUID, newUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+            log.warn("Email failed to send Case: {} Stage: {} CurrentUser: {} NewUser:{}", caseReference, stageUUID, currentUserUUID, newUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e.toString()));
+            log.warn(e.toString());
         }
     }
 
