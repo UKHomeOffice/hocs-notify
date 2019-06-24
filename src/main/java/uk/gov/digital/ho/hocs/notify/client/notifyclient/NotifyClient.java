@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
 import uk.gov.service.notify.NotificationClient;
@@ -26,8 +25,7 @@ public class NotifyClient {
     @Autowired
     public NotifyClient(InfoClient infoClient,
                         @Value("${notify.apiKey}") String apiKey,
-                        @Value("${hocs.url}") String url,
-                        RequestData requestData) {
+                        @Value("${hocs.url}") String url) {
         this.notificationClient = new NotificationClient(apiKey);
         this.url = url;
     }
@@ -47,7 +45,7 @@ public class NotifyClient {
         try {
             notificationClient.sendEmail(notifyType.getDisplayValue(), emailAddress, personalisation, null);
         } catch (Exception e) {
-            log.warn("Didn't send notify to {}", emailAddress, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+            log.warn("Didn't send Email to {}", emailAddress, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
         }
     }
 }

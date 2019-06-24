@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.digital.ho.hocs.notify.api.dto.NotifyCommand;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 
+import static uk.gov.digital.ho.hocs.notify.application.RequestData.transferHeadersToMDC;
+
 @Profile({"sqs","local"})
 @Component
 public class NotifyConsumer extends RouteBuilder {
@@ -58,6 +60,7 @@ public class NotifyConsumer extends RouteBuilder {
 
         from(fromQueue).routeId("notify-queue")
                 .setProperty(SqsConstants.RECEIPT_HANDLE, header(SqsConstants.RECEIPT_HANDLE))
+                .process(transferHeadersToMDC())
                 .log(LoggingLevel.INFO,"Notify Command Received")
                 .log(LoggingLevel.DEBUG,"Body: ${body}")
                 .unmarshal().json(JsonLibrary.Jackson, NotifyCommand.class)

@@ -69,13 +69,6 @@ public class RequestData implements HandlerInterceptor {
         };
     }
 
-    public static Processor transferHeadersToQueue() {
-        return ex -> {
-            ex.getIn().setHeader(CORRELATION_ID_HEADER, MDC.get(CORRELATION_ID_HEADER));
-            ex.getIn().setHeader(USER_ID_HEADER, MDC.get(USER_ID_HEADER));
-        };
-    }
-
     public String correlationId() {
         return MDC.get(CORRELATION_ID_HEADER);
     }
