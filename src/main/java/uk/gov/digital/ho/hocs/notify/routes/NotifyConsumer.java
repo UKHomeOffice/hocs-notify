@@ -7,10 +7,12 @@ import org.apache.camel.component.aws.sqs.SqsConstants;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import uk.gov.digital.ho.hocs.notify.api.dto.NotifyCommand;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 
+@Profile({"sqs","local"})
 @Component
 public class NotifyConsumer extends RouteBuilder {
 
