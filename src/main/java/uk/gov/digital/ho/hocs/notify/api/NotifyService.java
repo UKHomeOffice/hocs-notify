@@ -50,7 +50,10 @@ public class NotifyService {
         try {
             if (currentUserUUID != null) {
                 final UserDto offlineQaUser = infoClient.getUser(offlineQaUserUUID);
-                notifyClient.sendEmail(caseUUID, stageUUID, offlineQaUser.getEmail(), offlineQaUser.getFirstName(), caseReference, NotifyType.OFFLINE_QA_USER);
+                final UserDto currentUser = infoClient.getUser(currentUserUUID);
+                if (offlineQaUser != null && currentUser != null) {
+                    notifyClient.sendEmail(caseUUID, stageUUID, offlineQaUser.getEmail(), currentUser.displayFormat(), caseReference, NotifyType.OFFLINE_QA_USER);
+                }
             }
         } catch (Exception e) {
             log.warn("Notify failed to send Case: {} Stage: {} Team: {}", caseReference, stageUUID, currentUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
