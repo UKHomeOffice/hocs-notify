@@ -100,6 +100,40 @@ class NotifyServiceTest {
         verifyNoMoreInteractions(requestData);
     }
 
+    /* Send email to Offline QA User */
+    @Test
+    void ShouldSendOfflineQaEmailUnAllocated() {
+
+        UUID offlineQaUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
+        UUID currentUserUUID = UUID.fromString("22222222-0000-0000-0000-000000000000");
+
+        final UserDto currentUser = new UserDto("any", "name", "any", "notify");
+        when(infoClient.getUser(currentUserUUID)).thenReturn(currentUser);
+        when(infoClient.getUser(offlineQaUserUUID)).thenReturn(new UserDto("other", "person", "than", "other"));
+
+        notifyService.sendOfflineQaUserEmail(caseUUID, stageUUID, caseRef, currentUserUUID, offlineQaUserUUID);
+
+        verify(infoClient, times(1)).getUser(currentUserUUID);
+        verify(infoClient, times(1)).getUser(offlineQaUserUUID);
+        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "other", currentUser.displayFormat(), caseRef, NotifyType.OFFLINE_QA_USER );
+
+        verifyNoMoreInteractions(infoClient);
+        verifyNoMoreInteractions(notifyClient);
+    }
+
+    /* No Sending of  email to Offline QA User */
+    @Test
+    void ShouldNotSendOfflineQaEmailUnAllocated() {
+
+        UUID currentUserUUID = null;
+        UUID offlineQaUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
+
+        notifyService.sendOfflineQaUserEmail(caseUUID, stageUUID, caseRef, currentUserUUID, offlineQaUserUUID);
+
+        verifyZeroInteractions(infoClient);
+        verifyZeroInteractions(notifyClient);
+    }
+
     /* Send only user B an email is user A allocates user B's case to User A instead */
     @Test
     void ShouldNotSendSelfEmailAllocated() {

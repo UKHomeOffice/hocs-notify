@@ -22,6 +22,10 @@ public class UserDto {
     @JsonProperty("email")
     private String email;
 
+    public String displayFormat() {
+        return firstName + " " + lastName + " (" + email + ")";
+    }
+
 }
 
 
