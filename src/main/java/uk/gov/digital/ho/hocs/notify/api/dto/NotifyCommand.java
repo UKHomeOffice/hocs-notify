@@ -15,6 +15,7 @@ import java.util.UUID;
         property = "command"
 )
 @JsonSubTypes({ // Keep this list alphabetical
+        @JsonSubTypes.Type(value = OfflineQaUserCommand.class),
         @JsonSubTypes.Type(value = TeamAssignChangeCommand.class),
         @JsonSubTypes.Type(value = UserAssignChangeCommand.class),
 
