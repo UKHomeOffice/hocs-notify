@@ -56,7 +56,7 @@ public class NotifyService {
                 }
             }
         } catch (Exception e) {
-            log.warn("Notify failed to send Case: {} Stage: {} Team: {}", caseReference, stageUUID, currentUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+            log.warn("Notify failed to send Case: {} Stage: {} CurrentUser: {} OfflineQaUser: {}", caseReference, stageUUID, currentUserUUID, offlineQaUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
         }
     }
 
