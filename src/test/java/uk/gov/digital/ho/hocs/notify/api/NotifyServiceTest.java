@@ -8,13 +8,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.NominatedContactDto;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.TeamDto;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 import uk.gov.digital.ho.hocs.notify.client.notifyclient.NotifyClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -49,12 +48,16 @@ class NotifyServiceTest {
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = null;
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
+
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
         verify(infoClient).getUser(currentUserUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -87,6 +90,10 @@ class NotifyServiceTest {
         UUID currentUserUUID = null;
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
+
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
 
@@ -94,7 +101,7 @@ class NotifyServiceTest {
 
         verify(requestData).userIdUUID();
         verify(infoClient).getUser(newUserUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.ALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -112,11 +119,15 @@ class NotifyServiceTest {
         when(infoClient.getUser(currentUserUUID)).thenReturn(currentUser);
         when(infoClient.getUser(offlineQaUserUUID)).thenReturn(new UserDto("other", "person", "than", "other"));
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", currentUser.displayFormat());
+
         notifyService.sendOfflineQaUserEmail(caseUUID, stageUUID, caseRef, currentUserUUID, offlineQaUserUUID);
 
         verify(infoClient).getUser(currentUserUUID);
         verify(infoClient).getUser(offlineQaUserUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "other", currentUser.displayFormat(), caseRef, NotifyType.OFFLINE_QA_USER);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "other", personalisation, NotifyType.OFFLINE_QA_USER);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -142,6 +153,10 @@ class NotifyServiceTest {
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
+
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("11111111-0000-0000-0000-000000000000"));
 
@@ -149,7 +164,7 @@ class NotifyServiceTest {
 
         verify(requestData).userIdUUID();
         verify(infoClient).getUser(currentUserUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -164,6 +179,10 @@ class NotifyServiceTest {
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
+
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
@@ -173,8 +192,8 @@ class NotifyServiceTest {
         verify(requestData).userIdUUID();
         verify(infoClient).getUser(newUserUUID);
         verify(infoClient).getUser(currentUserUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.ALLOCATE_INDIVIDUAL);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -188,13 +207,20 @@ class NotifyServiceTest {
 
         UUID teamUUID = UUID.randomUUID();
         Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Someone"));
+        String teamName = "Team Name";
+        TeamDto teamDto = new TeamDto(teamName, "a", UUID.randomUUID(), false);
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("team", teamName);
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(nominatedContactDtos);
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(nominatedContactDtos);
+        when(infoClient.getTeam(teamUUID)).thenReturn(teamDto);
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient).getNominatedPeople(teamUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", "Team", caseRef, NotifyType.DISPATCH_REJECT);
+        verify(infoClient).getNominatedContacts(teamUUID);
+        verify(infoClient).getTeam(teamUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", personalisation, NotifyType.DISPATCH_REJECT);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -205,18 +231,26 @@ class NotifyServiceTest {
     void shouldSendMultipleTeamEmail() {
 
         UUID teamUUID = UUID.randomUUID();
+        String teamName = "Team Name";
+        TeamDto teamDto = new TeamDto(teamName, "a", UUID.randomUUID(), false);
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("team", teamName);
+
         Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Someone"),
                 new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Another"));
 
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(nominatedContactDtos);
-
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(nominatedContactDtos);
+        when(infoClient.getTeam(teamUUID)).thenReturn(teamDto);
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient).getNominatedPeople(teamUUID);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", "Team", caseRef, NotifyType.DISPATCH_REJECT);
-        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Another", "Team", caseRef, NotifyType.DISPATCH_REJECT);
+        verify(infoClient).getNominatedContacts(teamUUID);
+        verify(infoClient).getTeam(teamUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", personalisation, NotifyType.DISPATCH_REJECT);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Another", personalisation, NotifyType.DISPATCH_REJECT);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -228,11 +262,11 @@ class NotifyServiceTest {
 
         UUID teamUUID = UUID.randomUUID();
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(new HashSet<>(0));
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(new HashSet<>(0));
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient).getNominatedPeople(teamUUID);
+        verify(infoClient).getNominatedContacts(teamUUID);
 
         verifyNoMoreInteractions(infoClient);
         verifyZeroInteractions(notifyClient);

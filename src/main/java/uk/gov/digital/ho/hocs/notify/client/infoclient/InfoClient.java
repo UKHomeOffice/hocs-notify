@@ -27,15 +27,22 @@ public class InfoClient {
         this.serviceBaseURL = infoService;
     }
 
-    public Set<NominatedContactDto> getNominatedPeople(UUID teamUUID) {
-        Set<NominatedContactDto> response = restHelper.get(serviceBaseURL, String.format("/team/%s/contact", teamUUID), new ParameterizedTypeReference<Set<NominatedContactDto>>() {});
+    public Set<NominatedContactDto> getNominatedContacts(UUID teamUUID) {
+        Set<NominatedContactDto> response = restHelper.get(serviceBaseURL, String.format("/team/%s/contact", teamUUID), new ParameterizedTypeReference<Set<NominatedContactDto>>() {
+        });
         log.info("Got {} contacts for Team {}", response.size(), value(EVENT, INFO_CLIENT_GET_CONTACTS_SUCCESS));
         return response;
     }
 
     public UserDto getUser(UUID userUUID) {
         UserDto userDto = restHelper.get(serviceBaseURL, String.format("/user/%s", userUUID), UserDto.class);
-        log.info("Got User UserUUID {}", userUUID, value(EVENT, INFO_CLIENT_GET_USER_SUCCESS));
+        log.info("Got User UserUUID {}, event {}", userUUID, value(EVENT, INFO_CLIENT_GET_USER_SUCCESS));
         return userDto;
+    }
+
+    public TeamDto getTeam(UUID teamUUID) {
+        TeamDto response = restHelper.get(serviceBaseURL, String.format("/team/%s", teamUUID), TeamDto.class);
+        log.info("Got TeamDto for Team {}, event {}", teamUUID, value(EVENT, INFO_CLIENT_GET_TEAM_SUCCESS));
+        return response;
     }
 }

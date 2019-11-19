@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.notify.application.MigrationEnvCondition;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -22,9 +23,7 @@ public class NotifyClientMigrationImpl implements NotifyClient {
     }
 
     @Override
-    public void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, String firstname, String caseReference, NotifyType notifyType) {
-
+    public void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, Map<String, String> personalisation, NotifyType notifyType) {
         log.info("Suppressed sending notify due to migration profile, emailAddress {}, template ID {}", emailAddress, notifyType.getDisplayValue());
     }
-
 }
