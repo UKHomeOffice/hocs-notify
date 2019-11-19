@@ -27,8 +27,8 @@ public class InfoClient {
         this.serviceBaseURL = infoService;
     }
 
-    public Set<String> getNominatedPeople(UUID teamUUID) {
-        Set<String> response = restHelper.get(serviceBaseURL, String.format("/team/%s/contact", teamUUID), new ParameterizedTypeReference<Set<String>>() {});
+    public Set<NominatedContactDto> getNominatedPeople(UUID teamUUID) {
+        Set<NominatedContactDto> response = restHelper.get(serviceBaseURL, String.format("/team/%s/contact", teamUUID), new ParameterizedTypeReference<Set<NominatedContactDto>>() {});
         log.info("Got {} contacts for Team {}", response.size(), value(EVENT, INFO_CLIENT_GET_CONTACTS_SUCCESS));
         return response;
     }

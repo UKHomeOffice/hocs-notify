@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.NominatedContactDto;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 import uk.gov.digital.ho.hocs.notify.client.notifyclient.NotifyClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
@@ -36,9 +37,9 @@ public class NotifyService {
         try {
             if (teamUUID != null) {
                 NotifyType notifyType = NotifyType.valueOf(allocationType);
-                Set<String> nominatedPeople = infoClient.getNominatedPeople(teamUUID);
-                for (String contact : nominatedPeople) {
-                    notifyClient.sendEmail(caseUUID, stageUUID, contact, "Team", caseReference, notifyType);
+                Set<NominatedContactDto> nominatedContactDtos = infoClient.getNominatedPeople(teamUUID);
+                for (NominatedContactDto contact : nominatedContactDtos) {
+                    notifyClient.sendEmail(caseUUID, stageUUID, contact.getEmailAddress(), "Team", caseReference, notifyType);
                 }
             }
         } catch (Exception e) {
