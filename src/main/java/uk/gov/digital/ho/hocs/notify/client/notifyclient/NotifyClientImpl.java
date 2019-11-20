@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.notify.application.NonMigrationEnvCondition;
-import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 import uk.gov.service.notify.NotificationClient;
 
@@ -26,21 +25,19 @@ public class NotifyClientImpl implements NotifyClient {
     private final String url;
 
     @Autowired
-    public NotifyClientImpl(InfoClient infoClient,
-                        @Value("${notify.apiKey}") String apiKey,
-                        @Value("${hocs.url}") String url) {
+    public NotifyClientImpl(@Value("${notify.apiKey}") String apiKey,
+                            @Value("${hocs.url}") String url) {
         this.notificationClient = new NotificationClient(apiKey);
         this.url = url;
     }
 
     @Override
-    public void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, String firstname, String caseReference, NotifyType notifyType) {
+    public void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, Map<String, String> personalisation, NotifyType notifyType) {
         String link = String.format("%s/case/%s/stage/%s", url, caseUUID, stageUUID);
-        Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("link", link);
-        personalisation.put("caseRef", caseReference);
-        personalisation.put("user", firstname);
-        sendEmail(notifyType, emailAddress, personalisation);
+        Map<String, String> personalisationToSend = new HashMap<>(personalisation);
+        personalisationToSend.put("link", link);
+
+        sendEmail(notifyType, emailAddress, personalisationToSend);
     }
 
     private void sendEmail(NotifyType notifyType, String emailAddress, Map<String, String> personalisation) {
@@ -49,7 +46,7 @@ public class NotifyClientImpl implements NotifyClient {
         try {
             notificationClient.sendEmail(notifyType.getDisplayValue(), emailAddress, personalisation, null);
         } catch (Exception e) {
-            log.warn("Didn't send Email to {}", emailAddress, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+            log.warn("Didn't send Email to {}, event {}, exception {}", emailAddress, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
         }
     }
 }

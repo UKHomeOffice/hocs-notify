@@ -7,13 +7,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.NominatedContactDto;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.TeamDto;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 import uk.gov.digital.ho.hocs.notify.client.notifyclient.NotifyClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -43,17 +43,21 @@ class NotifyServiceTest {
 
     /* Send user A an email if their case is unallocated by anyone */
     @Test
-    void ShouldAlwaysSendEmailUnAllocate() {
+    void shouldAlwaysSendEmailUnAllocate() {
 
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = null;
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
 
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(infoClient, times(1)).getUser(currentUserUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL );
+        verify(infoClient).getUser(currentUserUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -63,7 +67,7 @@ class NotifyServiceTest {
 
     /* Don't send an email if user A allocated an unallocated case to user A */
     @Test
-    void ShouldNotSendSelfEmailUnAllocated() {
+    void shouldNotSendSelfEmailUnAllocated() {
 
         UUID currentUserUUID = null;
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
@@ -72,7 +76,7 @@ class NotifyServiceTest {
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData, times(1)).userIdUUID();
+        verify(requestData).userIdUUID();
 
         verifyZeroInteractions(infoClient);
         verifyZeroInteractions(notifyClient);
@@ -81,19 +85,23 @@ class NotifyServiceTest {
 
     /* Send user A an email if user B allocated an unallocated case to user A */
     @Test
-    void ShouldSendOtherEmailUnAllocated() {
+    void shouldSendOtherEmailUnAllocated() {
 
         UUID currentUserUUID = null;
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
 
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData, times(1)).userIdUUID();
-        verify(infoClient, times(1)).getUser(newUserUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.ALLOCATE_INDIVIDUAL );
+        verify(requestData).userIdUUID();
+        verify(infoClient).getUser(newUserUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -102,7 +110,7 @@ class NotifyServiceTest {
 
     /* Send email to Offline QA User */
     @Test
-    void ShouldSendOfflineQaEmailUnAllocated() {
+    void shouldSendOfflineQaEmailUnAllocated() {
 
         UUID offlineQaUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
         UUID currentUserUUID = UUID.fromString("22222222-0000-0000-0000-000000000000");
@@ -111,11 +119,15 @@ class NotifyServiceTest {
         when(infoClient.getUser(currentUserUUID)).thenReturn(currentUser);
         when(infoClient.getUser(offlineQaUserUUID)).thenReturn(new UserDto("other", "person", "than", "other"));
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", currentUser.displayFormat());
+
         notifyService.sendOfflineQaUserEmail(caseUUID, stageUUID, caseRef, currentUserUUID, offlineQaUserUUID);
 
-        verify(infoClient, times(1)).getUser(currentUserUUID);
-        verify(infoClient, times(1)).getUser(offlineQaUserUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "other", currentUser.displayFormat(), caseRef, NotifyType.OFFLINE_QA_USER );
+        verify(infoClient).getUser(currentUserUUID);
+        verify(infoClient).getUser(offlineQaUserUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "other", personalisation, NotifyType.OFFLINE_QA_USER);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -123,7 +135,7 @@ class NotifyServiceTest {
 
     /* No Sending of  email to Offline QA User */
     @Test
-    void ShouldNotSendOfflineQaEmailUnAllocated() {
+    void shouldNotSendOfflineQaEmailUnAllocated() {
 
         UUID currentUserUUID = null;
         UUID offlineQaUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
@@ -136,19 +148,23 @@ class NotifyServiceTest {
 
     /* Send only user B an email is user A allocates user B's case to User A instead */
     @Test
-    void ShouldNotSendSelfEmailAllocated() {
+    void shouldNotSendSelfEmailAllocated() {
 
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
+
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
 
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("11111111-0000-0000-0000-000000000000"));
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData, times(1)).userIdUUID();
-        verify(infoClient, times(1)).getUser(currentUserUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL );
+        verify(requestData).userIdUUID();
+        verify(infoClient).getUser(currentUserUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -163,17 +179,21 @@ class NotifyServiceTest {
         UUID currentUserUUID = UUID.fromString("33333333-0000-0000-0000-000000000000");
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
 
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("user", "name");
+
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData, times(1)).userIdUUID();
-        verify(infoClient, times(1)).getUser(newUserUUID);
-        verify(infoClient, times(1)).getUser(currentUserUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.ALLOCATE_INDIVIDUAL );
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "notify", "name", caseRef, NotifyType.UNALLOCATE_INDIVIDUAL );
+        verify(requestData).userIdUUID();
+        verify(infoClient).getUser(newUserUUID);
+        verify(infoClient).getUser(currentUserUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
 
         verifyNoMoreInteractions(infoClient);
@@ -183,16 +203,24 @@ class NotifyServiceTest {
 
     /* Send Team email when there is a teamUUID */
     @Test
-    void ShouldSendTeamEmail() {
+    void shouldSendTeamEmail() {
 
         UUID teamUUID = UUID.randomUUID();
+        Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Someone"));
+        String teamName = "Team Name";
+        TeamDto teamDto = new TeamDto(teamName, "a", UUID.randomUUID(), false);
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("team", teamName);
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(Set.of("Someone"));
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(nominatedContactDtos);
+        when(infoClient.getTeam(teamUUID)).thenReturn(teamDto);
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient, times(1)).getNominatedPeople(teamUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "Someone", "Team", caseRef, NotifyType.DISPATCH_REJECT );
+        verify(infoClient).getNominatedContacts(teamUUID);
+        verify(infoClient).getTeam(teamUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", personalisation, NotifyType.DISPATCH_REJECT);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -200,18 +228,29 @@ class NotifyServiceTest {
 
     /* Send Multiple Team email when there are more than one nominated people */
     @Test
-    void ShouldSendMultipleTeamEmail() {
+    void shouldSendMultipleTeamEmail() {
 
         UUID teamUUID = UUID.randomUUID();
+        String teamName = "Team Name";
+        TeamDto teamDto = new TeamDto(teamName, "a", UUID.randomUUID(), false);
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(Set.of("Someone", "Another"));
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseRef);
+        personalisation.put("team", teamName);
 
+        Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Someone"),
+                new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "Another"));
+
+
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(nominatedContactDtos);
+        when(infoClient.getTeam(teamUUID)).thenReturn(teamDto);
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient, times(1)).getNominatedPeople(teamUUID);
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "Someone", "Team", caseRef, NotifyType.DISPATCH_REJECT );
-        verify(notifyClient, times(1)).sendEmail(caseUUID, stageUUID, "Another", "Team", caseRef, NotifyType.DISPATCH_REJECT );
+        verify(infoClient).getNominatedContacts(teamUUID);
+        verify(infoClient).getTeam(teamUUID);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Someone", personalisation, NotifyType.DISPATCH_REJECT);
+        verify(notifyClient).sendEmail(caseUUID, stageUUID, "Another", personalisation, NotifyType.DISPATCH_REJECT);
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
@@ -219,15 +258,15 @@ class NotifyServiceTest {
 
     /* Send Team email when there are no nominated people */
     @Test
-    void ShouldSendNoTeamEmail() {
+    void shouldSendNoTeamEmail() {
 
         UUID teamUUID = UUID.randomUUID();
 
-        when(infoClient.getNominatedPeople(teamUUID)).thenReturn(new HashSet<>(0));
+        when(infoClient.getNominatedContacts(teamUUID)).thenReturn(new HashSet<>(0));
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, NotifyType.DISPATCH_REJECT.toString());
 
-        verify(infoClient, times(1)).getNominatedPeople(teamUUID);
+        verify(infoClient).getNominatedContacts(teamUUID);
 
         verifyNoMoreInteractions(infoClient);
         verifyZeroInteractions(notifyClient);
@@ -245,11 +284,11 @@ class NotifyServiceTest {
 
     /* Send No Team email when there is an invalid NotifyType */
     @Test
-    void ShouldNotSendTeamEmailNotifyTypeInvalid() {
+    void shouldNotSendTeamEmailNotifyTypeInvalid() {
 
         UUID teamUUID = UUID.randomUUID();
 
-        notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID,"invalid");
+        notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, "invalid");
 
         verifyZeroInteractions(infoClient);
         verifyZeroInteractions(notifyClient);
@@ -257,11 +296,11 @@ class NotifyServiceTest {
 
     /* Send No Team email when there is null NotifyType */
     @Test
-    void ShouldNotSendTeamEmailNotifyTypeNull() {
+    void shouldNotSendTeamEmailNotifyTypeNull() {
 
         UUID teamUUID = UUID.randomUUID();
 
-        notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID,null);
+        notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, null);
 
         verifyZeroInteractions(infoClient);
         verifyZeroInteractions(notifyClient);
