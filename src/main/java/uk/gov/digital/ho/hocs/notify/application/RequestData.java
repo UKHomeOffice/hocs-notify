@@ -14,7 +14,7 @@ import java.util.UUID;
 public class RequestData implements HandlerInterceptor {
 
     static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
-    static final String USER_ID_HEADER = "X-Auth-Userid";
+    static final String USER_ID_HEADER = "X-Auth-UserId";
     static final String GROUP_HEADER = "X-Auth-Groups";
     static final String CAMEL_CORRELATION_ID_HEADER = "correlationId";
 

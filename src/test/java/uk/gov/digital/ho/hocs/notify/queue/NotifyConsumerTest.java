@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.digital.ho.hocs.notify.api.dto.OfflineQaUserCommand;
 import uk.gov.digital.ho.hocs.notify.api.dto.TeamAssignChangeCommand;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
@@ -81,6 +82,19 @@ public class NotifyConsumerTest extends CamelTestSupport {
                 .when(mockNotifyDomain).executeCommand(teamAssignChangeCommand);
         getMockEndpoint(dlq).setExpectedCount(1);
         String json = mapper.writeValueAsString(teamAssignChangeCommand);
+        template.sendBody(notifyQueue, json);
+        getMockEndpoint(dlq).assertIsSatisfied();
+    }
+
+    @Test
+    public void shouldTransferOfflineQaToDLQOnFailure() throws JsonProcessingException, InterruptedException {
+
+        OfflineQaUserCommand offlineQaUserCommand = new OfflineQaUserCommand(caseUUID, stageUUID, "MIN/1234567/19", UUID.randomUUID(), UUID.randomUUID());
+
+        doThrow(EntityCreationException.class)
+                .when(mockNotifyDomain).executeCommand(offlineQaUserCommand);
+        getMockEndpoint(dlq).setExpectedCount(1);
+        String json = mapper.writeValueAsString(offlineQaUserCommand);
         template.sendBody(notifyQueue, json);
         getMockEndpoint(dlq).assertIsSatisfied();
     }

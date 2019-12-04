@@ -3,12 +3,17 @@ package uk.gov.digital.ho.hocs.notify.api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.NominatedContactDto;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.TeamDto;
+import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 import uk.gov.digital.ho.hocs.notify.client.notifyclient.NotifyClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
-import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
-import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,13 +41,36 @@ public class NotifyService {
         try {
             if (teamUUID != null) {
                 NotifyType notifyType = NotifyType.valueOf(allocationType);
-                Set<String> nominatedPeople = infoClient.getNominatedPeople(teamUUID);
-                for (String contact : nominatedPeople) {
-                    notifyClient.sendEmail(caseUUID, stageUUID, contact, "Team", caseReference, notifyType);
+                Set<NominatedContactDto> nominatedContactDtos = infoClient.getNominatedContacts(teamUUID);
+                if (!CollectionUtils.isEmpty(nominatedContactDtos)) {
+                    TeamDto team = infoClient.getTeam(teamUUID);
+                    for (NominatedContactDto contact : nominatedContactDtos) {
+                        Map<String, String> personalisation = new HashMap<>();
+                        personalisation.put("caseRef", caseReference);
+                        personalisation.put("team", team.getDisplayName());
+                        notifyClient.sendEmail(caseUUID, stageUUID, contact.getEmailAddress(), personalisation, notifyType);
+                    }
                 }
             }
         } catch (Exception e) {
-            log.warn("Notify failed to send Case: {} Stage: {} Team: {}", caseReference, stageUUID, teamUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+            log.warn("Notify failed to send Case: {} Stage: {} Team: {}, event: {}, error: {}", caseReference, stageUUID, teamUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
+        }
+    }
+
+    public void sendOfflineQaUserEmail(UUID caseUUID, UUID stageUUID, String caseReference, UUID currentUserUUID, UUID offlineQaUserUUID) {
+        try {
+            if (currentUserUUID != null) {
+                final UserDto offlineQaUser = infoClient.getUser(offlineQaUserUUID);
+                final UserDto currentUser = infoClient.getUser(currentUserUUID);
+                if (offlineQaUser != null && currentUser != null) {
+                    Map<String, String> personalisation = new HashMap<>();
+                    personalisation.put("caseRef", caseReference);
+                    personalisation.put("user", currentUser.displayFormat());
+                    notifyClient.sendEmail(caseUUID, stageUUID, offlineQaUser.getEmail(), personalisation, NotifyType.OFFLINE_QA_USER);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Notify failed to send Case: {} Stage: {} CurrentUser: {} OfflineQaUser: {}, event: {}, error: {}", caseReference, stageUUID, currentUserUUID, offlineQaUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
         }
     }
 
@@ -51,11 +79,11 @@ public class NotifyService {
             if (newUserUUID != null) {
                 if (currentUserUUID != null && !newUserUUID.equals(currentUserUUID)) {
                     sendUnAllocateUserEmail(caseUUID, stageUUID, currentUserUUID, caseReference);
-                    if(!newUserUUID.equals(requestData.userIdUUID())) {
+                    if (!newUserUUID.equals(requestData.userIdUUID())) {
                         sendAllocateUserEmail(caseUUID, stageUUID, newUserUUID, caseReference);
                     }
                 } else {
-                    if(!newUserUUID.equals(requestData.userIdUUID())) {
+                    if (!newUserUUID.equals(requestData.userIdUUID())) {
                         sendAllocateUserEmail(caseUUID, stageUUID, newUserUUID, caseReference);
                     }
                 }
@@ -63,18 +91,24 @@ public class NotifyService {
                 sendUnAllocateUserEmail(caseUUID, stageUUID, currentUserUUID, caseReference);
             }
         } catch (Exception e) {
-            log.warn("Email failed to send Case: {} Stage: {} CurrentUser: {} NewUser:{}", caseReference, stageUUID, currentUserUUID, newUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e.toString()));
+            log.warn("Email failed to send Case: {} Stage: {} CurrentUser: {} NewUser:{}, event: {}, error: {}", caseReference, stageUUID, currentUserUUID, newUserUUID, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e.toString()));
             log.warn(e.toString());
         }
     }
 
     private void sendAllocateUserEmail(UUID caseUUID, UUID stageUUID, UUID userUUID, String caseReference) {
         UserDto user = infoClient.getUser(userUUID);
-        notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), user.getFirstName(), caseReference, NotifyType.ALLOCATE_INDIVIDUAL);
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseReference);
+        personalisation.put("user", user.getFirstName());
+        notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
     }
 
     private void sendUnAllocateUserEmail(UUID caseUUID, UUID stageUUID, UUID userUUID, String caseReference) {
         UserDto user = infoClient.getUser(userUUID);
-        notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), user.getFirstName(), caseReference, NotifyType.UNALLOCATE_INDIVIDUAL);
+        Map<String, String> personalisation = new HashMap<>();
+        personalisation.put("caseRef", caseReference);
+        personalisation.put("user", user.getFirstName());
+        notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
     }
 }
