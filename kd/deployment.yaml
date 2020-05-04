@@ -52,6 +52,14 @@ spec:
             - name: bundle
               mountPath: /etc/ssl/certs
               readOnly: true
+          resources:
+            limits:
+              memory: 50Mi
+              cpu: 500m
+            requests:
+              memory: 15Mi
+              cpu: 300m
+
       containers:
         - name: certs
           image: quay.io/ukhomeofficedigital/cfssl-sidekick:v0.0.6
@@ -77,6 +85,14 @@ spec:
             - name: bundle
               mountPath: /etc/ssl/certs
               readOnly: true
+          resources:
+            limits:
+              memory: 16Mi
+              cpu: 150m
+            requests:
+              memory: 8Mi
+              cpu: 100m
+
         - name: proxy
           image: quay.io/ukhomeofficedigital/nginx-proxy:v3.4.12
           imagePullPolicy: Always
@@ -86,13 +102,6 @@ spec:
               drop:
                 - SETUID
                 - SETGID
-          resources:
-            limits:
-              memory: 512Mi
-              cpu: 250m
-            requests:
-              memory: 256Mi
-              cpu: 150m
           env:
             - name: PROXY_SERVICE_HOST
               value: '127.0.0.1'
@@ -125,6 +134,14 @@ spec:
           ports:
             - name: https
               containerPort: 10443
+          resources:
+            limits:
+              memory: 16Mi
+              cpu: 200m
+            requests:
+              memory: 4Mi
+              cpu: 100m
+
         - name: hocs-notify
           image: quay.io/ukhomeofficedigital/hocs-notify:{{.VERSION}}
           imagePullPolicy: Always
@@ -182,9 +199,9 @@ spec:
           resources:
             limits:
               cpu: 850m
-              memory: 2048Mi
+              memory: 640Mi
             requests:
-              cpu: 200m
+              cpu: 100m
               memory: 512Mi
           ports:
             - name: http
