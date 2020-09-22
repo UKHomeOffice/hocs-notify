@@ -198,10 +198,10 @@ spec:
                   key: url
           resources:
             limits:
-              cpu: 900m
-              memory: 1024Mi
+              cpu: 1200m
+              memory: 1536Mi
             requests:
-              cpu: 100m
+              cpu: 200m
               memory: 512Mi
           ports:
             - name: http
