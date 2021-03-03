@@ -20,7 +20,6 @@ pipeline:
     commands:
       - docker build -t hocs-notify .
     when:
-      branch: [master, refs/tags/*]
       event: [push, tag]
 
   install-docker-image:
