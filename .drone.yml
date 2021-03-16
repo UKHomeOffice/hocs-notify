@@ -141,7 +141,7 @@ steps:
         --registryUser=ukhomeofficedigital+hocs_quay_robot
         --service=hocs-notify
         --serviceGitToken=$${GITHUB_TOKEN}
-        --sourceBuild=$${IMAGE_VERSION}
+        --sourceBuild=$${VERSION}
         --version=$${SEMVER}
         --versionRepo="https://gitlab.digital.homeoffice.gov.uk/hocs/hocs-versions.git"
         --versionRepoServiceToken=$${GITLAB_TOKEN}
