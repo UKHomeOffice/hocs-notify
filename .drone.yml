@@ -6,6 +6,11 @@ name: build
 steps:
   - name: build project
     image: quay.io/ukhomeofficedigital/openjdk11:v11.0.5_10
+    commands:
+      - ./gradlew assemble --no-daemon
+
+  - name: test project
+    image: quay.io/ukhomeofficedigital/openjdk11:v11.0.5_10
     environment:
       DB_HOST: postgres
     commands:
@@ -14,7 +19,9 @@ steps:
       - AUDIT_QUEUE_NAME='notify-queue'
       - AUDIT_QUEUE_DLQ_NAME='notify-queue-dlq'
       - AWS_LOCAL_HOST='localstack'
-      - ./gradlew build
+      - ./gradlew check --no-daemon
+    depends_on:
+      - build project
 
   - name: build & push
     image: plugins/docker
@@ -30,7 +37,7 @@ steps:
         from_secret: QUAY_ROBOT_TOKEN
       DOCKER_USERNAME: ukhomeofficedigital+hocs_quay_robot
     depends_on:
-      - build project
+      - test project
 
   - name: build & push latest
     image: plugins/docker
@@ -47,7 +54,7 @@ steps:
       branch:
         - main
     depends_on:
-      - build project
+      - test project
 
 trigger:
   event:
