@@ -17,9 +17,8 @@ import java.util.UUID;
 @JsonSubTypes({ // Keep this list alphabetical
         @JsonSubTypes.Type(value = OfflineQaUserCommand.class),
         @JsonSubTypes.Type(value = TeamAssignChangeCommand.class),
-        @JsonSubTypes.Type(value = UserAssignChangeCommand.class),
-
-
+        @JsonSubTypes.Type(value = TeamRenameCommand.class),
+        @JsonSubTypes.Type(value = UserAssignChangeCommand.class)
 })
 
 public abstract class NotifyCommand implements Command {
