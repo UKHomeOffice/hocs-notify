@@ -305,4 +305,57 @@ class NotifyServiceTest {
         verifyZeroInteractions(infoClient);
         verifyZeroInteractions(notifyClient);
     }
+
+    @Test
+    void shouldSendTeamRenameEmail() {
+        NominatedContactDto nominatedContactDto =
+                new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "test@example.com");
+        TeamDto teamDto =
+                new TeamDto("TEST_NAME", "", UUID.randomUUID(), true);
+        UUID teamUuid = UUID.randomUUID();
+        String oldTeamName = "TEST";
+
+        when(infoClient.getNominatedContacts(teamUuid))
+                .thenReturn(Collections.singleton(nominatedContactDto));
+        when(infoClient.getTeam(teamUuid)).thenReturn(teamDto);
+
+        Map<String, String> personalisation = Map.of(
+                "oldTeamDisplayName", oldTeamName,
+                "newTeamDisplayName", teamDto.getDisplayName());
+
+        notifyService.sendTeamRenameEmail(teamUuid, oldTeamName);
+
+        verify(infoClient).getNominatedContacts(teamUuid);
+        verify(infoClient).getTeam(teamUuid);
+        verify(notifyClient).sendEmail("test@example.com", personalisation, NotifyType.TEAM_RENAME);
+
+        verifyNoMoreInteractions(infoClient);
+        verifyNoMoreInteractions(notifyClient);
+    }
+
+    @Test
+    void shouldNotSendEmail_whenNoNominatedContacts() {
+        UUID teamUuid = UUID.randomUUID();
+        String oldTeamName = "TEST";
+
+        when(infoClient.getNominatedContacts(teamUuid))
+                .thenReturn(Collections.emptySet());
+
+        notifyService.sendTeamRenameEmail(teamUuid, oldTeamName);
+
+        verify(infoClient).getNominatedContacts(teamUuid);
+
+        verifyNoMoreInteractions(infoClient);
+        verifyZeroInteractions(notifyClient);
+    }
+
+    @Test
+    void shouldNotSendTeamRenameEmail_whenNoTeamUuid() {
+        String oldTeamName = "TEST";
+
+        notifyService.sendTeamRenameEmail(null, oldTeamName);
+
+        verifyZeroInteractions(infoClient);
+        verifyZeroInteractions(notifyClient);
+    }
 }
