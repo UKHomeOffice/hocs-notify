@@ -111,4 +111,20 @@ public class NotifyService {
         personalisation.put("user", user.getFirstName());
         notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
     }
+
+    public void sendTeamRenameEmail(UUID teamUUID, String oldDisplayName) {
+        if (teamUUID != null) {
+            NotifyType notifyType = NotifyType.TEAM_RENAME;
+            Set<NominatedContactDto> nominatedContactDtos = infoClient.getNominatedContacts(teamUUID);
+            if (!CollectionUtils.isEmpty(nominatedContactDtos)) {
+                TeamDto team = infoClient.getTeam(teamUUID);
+                for (NominatedContactDto contact : nominatedContactDtos) {
+                    Map<String, String> personalisation =
+                            Map.of("oldTeamDisplayName", oldDisplayName,
+                                    "newTeamDisplayName", team.getDisplayName());
+                    notifyClient.sendEmail(contact.getEmailAddress(), personalisation, notifyType);
+                }
+            }
+        }
+    }
 }

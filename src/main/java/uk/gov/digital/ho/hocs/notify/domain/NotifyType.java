@@ -16,7 +16,8 @@ public enum NotifyType {
     NRN_REJECT("8d4f8da4-a646-468b-8e91-3063c12ae812"),
     TRANSFER_OGD_REJECT("d860dd8a-6873-4b07-be85-022aa505a9e2"),
     UNALLOCATE_INDIVIDUAL("6c76fa5b-9bf4-4e39-8ac3-452d49f919b2"),
-    OFFLINE_QA_USER("cd16d1d6-d1f1-41fd-8f14-e05b1f221443");
+    OFFLINE_QA_USER("cd16d1d6-d1f1-41fd-8f14-e05b1f221443"),
+    TEAM_RENAME("b2933fa2-cd13-4ddc-9b93-771420dee807");
 
     @Getter
     private String displayValue;

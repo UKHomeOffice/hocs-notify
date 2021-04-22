@@ -40,6 +40,11 @@ public class NotifyClientImpl implements NotifyClient {
         sendEmail(notifyType, emailAddress, personalisationToSend);
     }
 
+    @Override
+    public void sendEmail(String emailAddress, Map<String, String> personalisation, NotifyType notifyType) {
+        sendEmail(notifyType, emailAddress, personalisation);
+    }
+
     private void sendEmail(NotifyType notifyType, String emailAddress, Map<String, String> personalisation) {
         log.info("Sending notify to {}, template ID {}", emailAddress, notifyType.getDisplayValue());
 
