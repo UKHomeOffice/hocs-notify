@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface NotifyClient {
 
     void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, Map<String, String> personalisation, NotifyType notifyType);
+    void sendEmail(String emailAddress, Map<String, String> personalisation, NotifyType notifyType);
 
 }
