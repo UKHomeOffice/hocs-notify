@@ -29,6 +29,7 @@ dependencies {
 		exclude(module: 'spring-boot-starter-tomcat')
 	}
 	implementation('org.springframework.boot:spring-boot-starter-undertow')
+	implementation('org.springframework.retry:spring-retry')
 	implementation('net.logstash.logback:logstash-logback-encoder:5.3')
 	implementation('uk.gov.service.notify:notifications-java-client:3.12.0-RELEASE')
 	implementation('com.amazonaws:aws-java-sdk:1.11.569')

@@ -3,6 +3,7 @@ package uk.gov.digital.ho.hocs.notify.application;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -32,12 +33,14 @@ public class RestHelper {
         this.requestData = requestData;
     }
 
+    @Retryable
     public <R> R get(String serviceBaseURL, String url, Class<R> responseType) {
         log.info("RestHelper making Get request to {}{}", serviceBaseURL, url, value(EVENT, REST_HELPER_GET));
         ResponseEntity<R> response = restTemplate.exchange(String.format("%s%s", serviceBaseURL, url), HttpMethod.GET, new HttpEntity<>(null, createAuthHeaders()), responseType);
         return response.getBody();
     }
 
+    @Retryable
     public <R> R get(String serviceBaseURL, String url, ParameterizedTypeReference<R> responseType) {
         log.info("RestHelper making Get request to {}{}", serviceBaseURL, url, value(EVENT, REST_HELPER_GET));
         ResponseEntity<R> response = restTemplate.exchange(String.format("%s%s", serviceBaseURL, url), HttpMethod.GET, new HttpEntity<>(null, createAuthHeaders()), responseType);
