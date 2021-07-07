@@ -16,7 +16,7 @@ public class HocsNotifyServiceApplication {
 
 	@PreDestroy
 	public void stop() {
-		log.info("hocs-notify stopping gracefully");
+		log.info("Stopping gracefully");
 	}
 
 }
