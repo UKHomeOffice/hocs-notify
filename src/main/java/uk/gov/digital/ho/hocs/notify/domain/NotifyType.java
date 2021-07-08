@@ -4,7 +4,6 @@ import lombok.Getter;
 
 public enum NotifyType {
 
-
     INITIAL_DRAFT_REJECT("3a47cd64-2ebb-411d-8194-fd384f377ccc"),
     QA_REJECT("f604a555-9a1a-40ec-8a60-61fb495630e9"),
     PRIVATE_OFFICE_REJECT("f432a529-1b1b-49af-976d-ce23e745e474"),
@@ -17,12 +16,13 @@ public enum NotifyType {
     TRANSFER_OGD_REJECT("d860dd8a-6873-4b07-be85-022aa505a9e2"),
     UNALLOCATE_INDIVIDUAL("6c76fa5b-9bf4-4e39-8ac3-452d49f919b2"),
     OFFLINE_QA_USER("cd16d1d6-d1f1-41fd-8f14-e05b1f221443"),
-    TEAM_RENAME("b2933fa2-cd13-4ddc-9b93-771420dee807");
+    TEAM_RENAME("b2933fa2-cd13-4ddc-9b93-771420dee807"),
+    TEAM_ACTIVE("e7610b1a-3308-4853-97ce-3108800b49e9");
 
     @Getter
-    private String displayValue;
+    private String emailTemplateId;
 
     NotifyType(String value) {
-        displayValue = value;
+        emailTemplateId = value;
     }
 }

@@ -46,10 +46,10 @@ public class NotifyClientImpl implements NotifyClient {
     }
 
     private void sendEmail(NotifyType notifyType, String emailAddress, Map<String, String> personalisation) {
-        log.info("Sending notify to {}, template ID {}", emailAddress, notifyType.getDisplayValue());
+        log.info("Sending notify to {}, template ID {}", emailAddress, notifyType.getEmailTemplateId());
 
         try {
-            notificationClient.sendEmail(notifyType.getDisplayValue(), emailAddress, personalisation, null);
+            notificationClient.sendEmail(notifyType.getEmailTemplateId(), emailAddress, personalisation, null);
         } catch (Exception e) {
             log.warn("Didn't send Email to {}, event {}, exception {}", emailAddress, value(EVENT, NOTIFY_EMAIL_FAILED), value(EXCEPTION, e));
         }

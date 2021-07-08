@@ -3,8 +3,12 @@ package uk.gov.digital.ho.hocs.notify.api;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.NominatedContactDto;
@@ -13,7 +17,12 @@ import uk.gov.digital.ho.hocs.notify.client.infoclient.UserDto;
 import uk.gov.digital.ho.hocs.notify.client.notifyclient.NotifyClient;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -62,7 +71,7 @@ class NotifyServiceTest {
 
         verifyNoMoreInteractions(infoClient);
         verifyNoMoreInteractions(notifyClient);
-        verifyZeroInteractions(requestData);
+        verifyNoInteractions(requestData);
     }
 
     /* Don't send an email if user A allocated an unallocated case to user A */
@@ -78,8 +87,8 @@ class NotifyServiceTest {
 
         verify(requestData).userIdUUID();
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
         verifyNoMoreInteractions(requestData);
     }
 
@@ -142,8 +151,8 @@ class NotifyServiceTest {
 
         notifyService.sendOfflineQaUserEmail(caseUUID, stageUUID, caseRef, currentUserUUID, offlineQaUserUUID);
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
     }
 
     /* Send only user B an email is user A allocates user B's case to User A instead */
@@ -197,7 +206,7 @@ class NotifyServiceTest {
 
 
         verifyNoMoreInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(notifyClient);
         verifyNoMoreInteractions(requestData);
     }
 
@@ -269,7 +278,7 @@ class NotifyServiceTest {
         verify(infoClient).getNominatedContacts(teamUUID);
 
         verifyNoMoreInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(notifyClient);
     }
 
     /* Send No Team email when there is no teamUUID */
@@ -278,8 +287,8 @@ class NotifyServiceTest {
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, null, NotifyType.DISPATCH_REJECT.toString());
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
     }
 
     /* Send No Team email when there is an invalid NotifyType */
@@ -290,8 +299,8 @@ class NotifyServiceTest {
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, "invalid");
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
     }
 
     /* Send No Team email when there is null NotifyType */
@@ -302,8 +311,8 @@ class NotifyServiceTest {
 
         notifyService.sendTeamAssignChangeEmail(caseUUID, stageUUID, caseRef, teamUUID, null);
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
     }
 
     @Test
@@ -334,6 +343,43 @@ class NotifyServiceTest {
     }
 
     @Test
+    void shouldSendTeamActiveEmail() {
+
+        // given
+        Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "test@example.com"),
+                new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "test2@example.com"));
+
+        TeamDto teamDto =
+                new TeamDto("TEST_NAME", "", UUID.randomUUID(), true);
+        UUID teamUuid = UUID.randomUUID();
+
+        when(infoClient.getNominatedContacts(teamUuid))
+                .thenReturn(nominatedContactDtos);
+        when(infoClient.getTeam(teamUuid)).thenReturn(teamDto);
+
+        // when
+        notifyService.sendTeamActiveEmail(teamUuid, Boolean.FALSE);
+
+        // then
+        verify(infoClient).getNominatedContacts(teamUuid);
+        verify(infoClient).getTeam(teamUuid);
+        ArgumentCaptor<Map<String, String>> templateFieldCapture = ArgumentCaptor.forClass(Map.class);
+
+        // first invocation
+        verify(notifyClient).sendEmail(eq("test@example.com" ), templateFieldCapture.capture(), eq(NotifyType.TEAM_ACTIVE));
+        Map<String, String> templateFieldsCalled = templateFieldCapture.getValue();
+        assertThat(templateFieldsCalled).containsAllEntriesOf(Map.of(
+                "teamName", "TEST_NAME",
+                "activeDisplayStatus", "Active"));
+
+        // second invocation
+        verify(notifyClient).sendEmail(eq("test2@example.com" ), any(), eq(NotifyType.TEAM_ACTIVE));
+
+        verifyNoMoreInteractions(infoClient);
+        verifyNoMoreInteractions(notifyClient);
+    }
+
+    @Test
     void shouldNotSendEmail_whenNoNominatedContacts() {
         UUID teamUuid = UUID.randomUUID();
         String oldTeamName = "TEST";
@@ -346,7 +392,7 @@ class NotifyServiceTest {
         verify(infoClient).getNominatedContacts(teamUuid);
 
         verifyNoMoreInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(notifyClient);
     }
 
     @Test
@@ -355,7 +401,7 @@ class NotifyServiceTest {
 
         notifyService.sendTeamRenameEmail(null, oldTeamName);
 
-        verifyZeroInteractions(infoClient);
-        verifyZeroInteractions(notifyClient);
+        verifyNoInteractions(infoClient);
+        verifyNoInteractions(notifyClient);
     }
 }
