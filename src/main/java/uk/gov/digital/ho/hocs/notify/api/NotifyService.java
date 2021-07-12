@@ -145,7 +145,9 @@ public class NotifyService {
 
         Map<String, String> personalisation =
                 Map.of("teamName", team.getDisplayName(),
-                        "activeDisplayStatus", convertActiveToDisplayString(currentActiveStatus));
+                        "activeStatus", currentActiveStatus ? "active" : "inactive",
+                        "availableStatus", currentActiveStatus ? "available": "unavailable"
+                        );
 
         nominatedContacts.forEach(nominatedContactDto ->
             notifyClient.sendEmail(nominatedContactDto.getEmailAddress(), personalisation, NotifyType.TEAM_ACTIVE)
@@ -153,7 +155,4 @@ public class NotifyService {
 
     }
 
-    private String convertActiveToDisplayString(boolean aBoolean) {
-        return aBoolean ? "Active" : "Inactive";
-    }
 }

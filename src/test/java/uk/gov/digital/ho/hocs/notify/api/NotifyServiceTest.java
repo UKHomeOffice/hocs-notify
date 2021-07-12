@@ -206,7 +206,7 @@ class NotifyServiceTest {
 
 
         verifyNoMoreInteractions(infoClient);
-        verifyNoInteractions(notifyClient);
+        verifyNoMoreInteractions(notifyClient);
         verifyNoMoreInteractions(requestData);
     }
 
@@ -344,6 +344,16 @@ class NotifyServiceTest {
 
     @Test
     void shouldSendTeamActiveEmail() {
+        sendActiveEmail(true);
+    }
+
+    @Test
+    void shouldSendTeamInActiveEmail() {
+        sendActiveEmail(false);
+    }
+
+
+    private void sendActiveEmail(boolean activeStatus) {
 
         // given
         Set<NominatedContactDto> nominatedContactDtos = Set.of(new NominatedContactDto(UUID.randomUUID(), UUID.randomUUID(), "test@example.com"),
@@ -358,7 +368,7 @@ class NotifyServiceTest {
         when(infoClient.getTeam(teamUuid)).thenReturn(teamDto);
 
         // when
-        notifyService.sendTeamActiveEmail(teamUuid, Boolean.FALSE);
+        notifyService.sendTeamActiveEmail(teamUuid, activeStatus);
 
         // then
         verify(infoClient).getNominatedContacts(teamUuid);
@@ -370,7 +380,8 @@ class NotifyServiceTest {
         Map<String, String> templateFieldsCalled = templateFieldCapture.getValue();
         assertThat(templateFieldsCalled).containsAllEntriesOf(Map.of(
                 "teamName", "TEST_NAME",
-                "activeDisplayStatus", "Active"));
+                "activeStatus", activeStatus ? "active" : "inactive",
+                "availableStatus", activeStatus ? "available" : "unavailable"));
 
         // second invocation
         verify(notifyClient).sendEmail(eq("test2@example.com" ), any(), eq(NotifyType.TEAM_ACTIVE));

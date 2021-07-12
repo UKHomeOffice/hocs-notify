@@ -24,7 +24,7 @@ public class TeamActiveCommand extends NotifyCommand {
 
     @JsonCreator
     public TeamActiveCommand(@JsonProperty ( "teamUUID" ) @NonNull UUID teamUUID,
-                             @JsonProperty ( "active" ) @NonNull Boolean currentActiveStatus) {
+                             @JsonProperty ( "currentActiveStatus" ) @NonNull Boolean currentActiveStatus) {
         super(TEAM_ACTIVE_COMMAND, UUID.randomUUID(), null, null);
         this.teamUUID = teamUUID;
         this.currentActiveStatus = currentActiveStatus;
