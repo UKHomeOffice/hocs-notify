@@ -3,6 +3,7 @@ package uk.gov.digital.ho.hocs.notify.api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.client.infoclient.InfoClient;
@@ -24,6 +25,8 @@ import static uk.gov.digital.ho.hocs.notify.application.LogEvent.*;
 @Slf4j
 public class NotifyService {
 
+    public static final String CASE_REF = "caseRef";
+    public static final String TEAM = "team";
     private final InfoClient infoClient;
     private final RequestData requestData;
     private final NotifyClient notifyClient;
@@ -46,8 +49,8 @@ public class NotifyService {
                     TeamDto team = infoClient.getTeam(teamUUID);
                     for (NominatedContactDto contact : nominatedContactDtos) {
                         Map<String, String> personalisation = new HashMap<>();
-                        personalisation.put("caseRef", caseReference);
-                        personalisation.put("team", team.getDisplayName());
+                        personalisation.put(CASE_REF, caseReference);
+                        personalisation.put(TEAM, team.getDisplayName());
                         notifyClient.sendEmail(caseUUID, stageUUID, contact.getEmailAddress(), personalisation, notifyType);
                     }
                 }
@@ -64,7 +67,7 @@ public class NotifyService {
                 final UserDto currentUser = infoClient.getUser(currentUserUUID);
                 if (offlineQaUser != null && currentUser != null) {
                     Map<String, String> personalisation = new HashMap<>();
-                    personalisation.put("caseRef", caseReference);
+                    personalisation.put(CASE_REF, caseReference);
                     personalisation.put("user", currentUser.displayFormat());
                     notifyClient.sendEmail(caseUUID, stageUUID, offlineQaUser.getEmail(), personalisation, NotifyType.OFFLINE_QA_USER);
                 }
@@ -99,7 +102,7 @@ public class NotifyService {
     private void sendAllocateUserEmail(UUID caseUUID, UUID stageUUID, UUID userUUID, String caseReference) {
         UserDto user = infoClient.getUser(userUUID);
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("caseRef", caseReference);
+        personalisation.put(CASE_REF, caseReference);
         personalisation.put("user", user.getFirstName());
         notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
     }
@@ -107,7 +110,7 @@ public class NotifyService {
     private void sendUnAllocateUserEmail(UUID caseUUID, UUID stageUUID, UUID userUUID, String caseReference) {
         UserDto user = infoClient.getUser(userUUID);
         Map<String, String> personalisation = new HashMap<>();
-        personalisation.put("caseRef", caseReference);
+        personalisation.put(CASE_REF, caseReference);
         personalisation.put("user", user.getFirstName());
         notifyClient.sendEmail(caseUUID, stageUUID, user.getEmail(), personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
     }
@@ -127,4 +130,29 @@ public class NotifyService {
             }
         }
     }
+
+    public void sendTeamActiveEmail(UUID teamUUID, Boolean currentActiveStatus) {
+
+        Assert.notNull(teamUUID, "teamUUID parameter should not be null");
+        Assert.notNull(currentActiveStatus, "currentActiveStatus parameter should not be null");
+
+        Set<NominatedContactDto> nominatedContacts = infoClient.getNominatedContacts(teamUUID);
+        if (nominatedContacts.isEmpty()) {
+            return;
+        }
+
+        TeamDto team = infoClient.getTeam(teamUUID);
+
+        Map<String, String> personalisation =
+                Map.of("teamName", team.getDisplayName(),
+                        "activeStatus", currentActiveStatus ? "active" : "inactive",
+                        "availableStatus", currentActiveStatus ? "available": "unavailable"
+                        );
+
+        nominatedContacts.forEach(nominatedContactDto ->
+            notifyClient.sendEmail(nominatedContactDto.getEmailAddress(), personalisation, NotifyType.TEAM_ACTIVE)
+        );
+
+    }
+
 }

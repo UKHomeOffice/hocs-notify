@@ -24,11 +24,11 @@ public class NotifyClientMigrationImpl implements NotifyClient {
 
     @Override
     public void sendEmail(UUID caseUUID, UUID stageUUID, String emailAddress, Map<String, String> personalisation, NotifyType notifyType) {
-        log.info("Suppressed sending notify due to migration profile, emailAddress {}, template ID {}", emailAddress, notifyType.getDisplayValue());
+        log.info("Suppressed sending notify due to migration profile, emailAddress {}, template ID {}", emailAddress, notifyType.getEmailTemplateId());
     }
 
     @Override
     public void sendEmail(String emailAddress, Map<String, String> personalisation, NotifyType notifyType) {
-        log.info("Suppressed sending notify due to migration profile, emailAddress {}, template ID {}", emailAddress, notifyType.getDisplayValue());
+        log.info("Suppressed sending notify due to migration profile, emailAddress {}, template ID {}", emailAddress, notifyType.getEmailTemplateId());
     }
 }
