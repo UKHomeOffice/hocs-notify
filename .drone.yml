@@ -49,6 +49,8 @@ steps:
       registry: quay.io
       repo: quay.io/ukhomeofficedigital/hocs-notify
       tags:
+        - build_${DRONE_BUILD_NUMBER}
+        - ${DRONE_COMMIT_SHA}
         - latest
     environment:
       DOCKER_PASSWORD:
