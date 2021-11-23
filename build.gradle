@@ -1,0 +1,61 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.1'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'uk.gov.digital.ho.hocs'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	jcenter()
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+
+dependencies {
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-web') {
+		exclude(module: 'spring-boot-starter-tomcat')
+	}
+	implementation('org.springframework.boot:spring-boot-starter-undertow')
+	implementation('org.springframework.retry:spring-retry')
+	implementation('net.logstash.logback:logstash-logback-encoder:5.3')
+	implementation('uk.gov.service.notify:notifications-java-client:3.12.0-RELEASE')
+	implementation('com.amazonaws:aws-java-sdk:1.11.569')
+
+	implementation('org.apache.camel:camel-spring-boot:2.24.0')
+	implementation('org.apache.camel:camel-jackson:2.24.0')
+	implementation('org.apache.camel:camel-aws:2.24.0')
+	implementation('javax.xml.bind:jaxb-api:2.3.1')
+	
+	compileOnly('org.projectlombok:lombok')
+	annotationProcessor('org.projectlombok:lombok')
+	annotationProcessor('org.springframework:spring-context-indexer:5.3.12')
+
+	testImplementation('org.springframework.boot:spring-boot-starter-test') {
+		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+		exclude group: 'junit', module: 'junit'
+	}
+	testImplementation('org.apache.camel:camel-test-spring:2.24.0')
+	testImplementation('org.assertj:assertj-core')
+}
+
+
+test {
+	useJUnitPlatform()
+}
+
+jar {
+	enabled = false
+}

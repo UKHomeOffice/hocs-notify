@@ -1,1 +1,2 @@
-# Kube-hocs-notify
+# hocs-notify
+Hocs Notify Integration microservice
