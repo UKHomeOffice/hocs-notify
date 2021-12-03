@@ -1,6 +1,7 @@
 plugins {
 	id 'org.springframework.boot' version '2.5.1'
 	id 'java'
+	id 'jacoco'
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -22,6 +23,24 @@ repositories {
 	maven { url 'https://repo.spring.io/milestone' }
 }
 
+plugins.withType(JacocoPlugin) {
+	tasks["test"].finalizedBy 'jacocoTestReport'
+}
+
+test {
+	finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+jacocoTestReport {
+	dependsOn test // tests are required to run before generating the report
+	reports {
+		xml.required = true
+		html.required = false
+		csv.required = false
+		//for XML
+		xml.destination file("${buildDir}/reports/jacoco.xml")
+	}
+}
 
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
@@ -38,7 +57,7 @@ dependencies {
 	implementation('org.apache.camel:camel-jackson:2.24.0')
 	implementation('org.apache.camel:camel-aws:2.24.0')
 	implementation('javax.xml.bind:jaxb-api:2.3.1')
-	
+
 	compileOnly('org.projectlombok:lombok')
 	annotationProcessor('org.projectlombok:lombok')
 	annotationProcessor('org.springframework:spring-context-indexer:5.3.12')
