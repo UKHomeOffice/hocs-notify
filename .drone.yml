@@ -23,8 +23,8 @@ steps:
     depends_on:
       - build project
 
-  - name: sonar scanner
-    image: quay.io/ukhomeofficedigital/sonar-scanner:v3.0.3
+  - name: scan using sonar
+    image: quay.io/ukhomeofficedigital/sonar-scanner:latest
     depends_on:
       - test project
 
