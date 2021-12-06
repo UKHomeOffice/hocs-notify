@@ -23,6 +23,11 @@ steps:
     depends_on:
       - build project
 
+  - name: scan using sonar
+    image: quay.io/ukhomeofficedigital/sonar-scanner:latest
+    depends_on:
+      - test project
+
   - name: build & push
     image: plugins/docker
     settings:
