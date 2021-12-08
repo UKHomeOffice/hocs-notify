@@ -25,6 +25,8 @@ steps:
 
   - name: scan using sonar
     image: quay.io/ukhomeofficedigital/sonar-scanner:latest
+    commands:
+      - sonar-scanner -Dsonar.projectVersion="$(git rev-parse --abbrev-ref HEAD)"
     depends_on:
       - test project
 
