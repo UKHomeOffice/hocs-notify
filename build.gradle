@@ -5,7 +5,7 @@ plugins {
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 }
 
-def camelVersion = '2.24.0'
+def camelVersion = '2.25.4'
 
 group = 'uk.gov.digital.ho.hocs'
 version = '0.0.1-SNAPSHOT'
