@@ -44,7 +44,7 @@ dependencies {
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
 
 	implementation 'uk.gov.service.notify:notifications-java-client:3.17.2-RELEASE'
-	implementation 'com.amazonaws:aws-java-sdk:1.12.132'
+	implementation 'com.amazonaws:aws-java-sdk:1.12.133'
 
 	implementation "org.apache.camel:camel-spring-boot:${camelVersion}"
 	implementation "org.apache.camel:camel-jackson:${camelVersion}"
