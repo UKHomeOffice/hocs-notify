@@ -35,6 +35,7 @@ aws:
             key: 12345
 
 hocs:
+    basicauth: UNSET
     info-service: http://localhost:8085
     url: http://localhost:8080
 
