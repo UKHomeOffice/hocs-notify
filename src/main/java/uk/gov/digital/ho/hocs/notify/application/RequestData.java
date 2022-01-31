@@ -1,6 +1,5 @@
 package uk.gov.digital.ho.hocs.notify.application;
 
-import org.apache.camel.Processor;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -16,7 +15,6 @@ public class RequestData implements HandlerInterceptor {
     static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
     static final String USER_ID_HEADER = "X-Auth-UserId";
     static final String GROUP_HEADER = "X-Auth-Groups";
-    static final String CAMEL_CORRELATION_ID_HEADER = "correlationId";
 
     private static final String ANONYMOUS = "anonymous";
 
@@ -61,14 +59,6 @@ public class RequestData implements HandlerInterceptor {
         return !isNullOrEmpty(groups) ? groups : "/QU5PTllNT1VTCg==";
     }
 
-    public static Processor transferHeadersToMDC() {
-        return ex -> {
-            MDC.put(CORRELATION_ID_HEADER, ex.getIn().getHeader(CORRELATION_ID_HEADER, String.class));
-            MDC.put(CAMEL_CORRELATION_ID_HEADER, ex.getIn().getHeader(CORRELATION_ID_HEADER, String.class));
-            MDC.put(USER_ID_HEADER, ex.getIn().getHeader(USER_ID_HEADER, String.class));
-        };
-    }
-
     public String correlationId() {
         return MDC.get(CORRELATION_ID_HEADER);
     }
@@ -84,6 +74,5 @@ public class RequestData implements HandlerInterceptor {
     public String groups() {
         return MDC.get(GROUP_HEADER);
     }
-
 
 }
