@@ -112,6 +112,11 @@ environment:
   DOCKER_HOST: tcp://docker:2375
 
 steps:
+  - name: fetch and checkout
+    image: alpine/git
+    commands:
+      - git fetch --tags
+      - git checkout $${VERSION}
 
   - name: deploy to cs-dev
     image: quay.io/ukhomeofficedigital/kd:v1.16.0
@@ -124,6 +129,8 @@ steps:
         from_secret: hocs_notify_cs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
       VERSION: build_${DRONE_BUILD_NUMBER}
+    depends_on:
+      - fetch and checkout
     when:
       branch:
         - main
@@ -141,6 +148,8 @@ steps:
         from_secret: hocs_notify_wcs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
       VERSION: build_${DRONE_BUILD_NUMBER}
+    depends_on:
+      - fetch and checkout
     when:
       branch:
         - main
@@ -182,6 +191,7 @@ steps:
         from_secret: GITHUB_TOKEN
     depends_on:
       - wait for docker
+      - fetch and checkout
     when:
       event:
         - promote
@@ -238,6 +248,8 @@ steps:
       KUBE_TOKEN:
         from_secret: hocs_notify_${DRONE_DEPLOY_TO/-/_}
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
+    depends_on:
+      - fetch and checkout
     when:
       event:
         - promote
@@ -256,6 +268,8 @@ steps:
       KUBE_TOKEN:
         from_secret: hocs_notify_${DRONE_DEPLOY_TO/-/_}
       KUBE_SERVER: https://kube-api-prod.prod.acp.homeoffice.gov.uk
+    depends_on:
+      - fetch and checkout
     when:
       event:
         - promote
