@@ -165,8 +165,6 @@ spec:
               value: '8080'
             - name: SPRING_PROFILES_ACTIVE
               value: 'sqs'
-            - name: NOTIFY_QUEUE_NAME
-              value: {{.KUBE_NAMESPACE}}-notify-sqs
             - name: AWS_SQS_NOTIFY_URL
               valueFrom:
                 secretKeyRef:

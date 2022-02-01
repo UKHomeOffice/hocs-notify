@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 @EqualsAndHashCode(of="uuid")
@@ -21,7 +22,7 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = TeamRenameCommand.class),
         @JsonSubTypes.Type(value = UserAssignChangeCommand.class)
 })
-
+@NoArgsConstructor
 public abstract class NotifyCommand implements Command {
 
     @Getter
