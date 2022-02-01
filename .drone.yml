@@ -112,6 +112,8 @@ steps:
         from_secret: hocs_notify_cs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
       VERSION: build_${DRONE_BUILD_NUMBER}
+    depends_on:
+      - fetch and checkout
     when:
       branch:
         - main
@@ -129,6 +131,8 @@ steps:
         from_secret: hocs_notify_wcs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
       VERSION: build_${DRONE_BUILD_NUMBER}
+    depends_on:
+      - fetch and checkout
     when:
       branch:
         - main
