@@ -1,6 +1,7 @@
 package uk.gov.digital.ho.hocs.notify.aws.listeners;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -22,18 +23,18 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 public class NotifyListenerTest {
 
     @Autowired
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
 
     @Mock
     private NotifyDomain notifyDomain;
 
     @Test
-    public void callsNotifyDomainWithValidNotifyCommand() {
+    public void callsNotifyDomainWithValidNotifyCommand() throws JsonProcessingException {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
-        String message = gson.toJson(teamAssignChangeCommand);
+        String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
-        NotifyListener notifyListener = new NotifyListener(gson, notifyDomain);
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
 
         notifyListener.onNotifyEvent(message);
 
@@ -42,16 +43,16 @@ public class NotifyListenerTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void callsAuditServiceWithNullCreateCaseMessage() {
-        NotifyListener notifyListener = new NotifyListener(gson, notifyDomain);
+    public void callsAuditServiceWithNullCreateCaseMessage() throws JsonProcessingException {
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
 
         notifyListener.onNotifyEvent(null);
     }
 
     @Test(expected = EntityCreationException.class)
-    public void callsAuditServiceWithInvalidCreateCaseMessage() {
+    public void callsAuditServiceWithInvalidCreateCaseMessage() throws JsonProcessingException {
         String incorrectMessage = "{test:1}";
-        NotifyListener notifyListener = new NotifyListener(gson, notifyDomain);
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
 
         notifyListener.onNotifyEvent(incorrectMessage);
     }

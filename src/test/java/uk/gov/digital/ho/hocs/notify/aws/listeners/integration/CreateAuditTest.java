@@ -1,6 +1,7 @@
 package uk.gov.digital.ho.hocs.notify.aws.listeners.integration;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +24,15 @@ import static org.mockito.Mockito.verify;
 public class CreateAuditTest extends BaseAwsSqsIntegrationTest {
 
     @Autowired
-    private Gson gson;
+    private ObjectMapper objectMapper;
 
     @MockBean
     public NotifyDomain notifyDomain;
 
     @Test
-    public void consumeMessageFromQueue() {
+    public void consumeMessageFromQueue() throws JsonProcessingException {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
-        String message = gson.toJson(teamAssignChangeCommand);
+        String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
         amazonSQSAsync.sendMessage(auditQueue, message);
 
@@ -41,9 +42,9 @@ public class CreateAuditTest extends BaseAwsSqsIntegrationTest {
     }
 
     @Test
-    public void consumeMessageFromQueue_exceptionMakesMessageNotVisible() {
+    public void consumeMessageFromQueue_exceptionMakesMessageNotVisible() throws JsonProcessingException {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
-        String message = gson.toJson(teamAssignChangeCommand);
+        String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
         doThrow(new NullPointerException("TEST")).when(notifyDomain).executeCommand(teamAssignChangeCommand);
 

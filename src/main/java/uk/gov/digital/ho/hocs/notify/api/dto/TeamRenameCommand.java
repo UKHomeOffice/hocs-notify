@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import uk.gov.digital.ho.hocs.notify.api.NotifyService;
 
@@ -17,15 +15,12 @@ import static uk.gov.digital.ho.hocs.notify.api.dto.TeamRenameCommand.TEAM_RENAM
 @Getter
 @JsonTypeName(TEAM_RENAME_COMMAND)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 public class TeamRenameCommand extends NotifyCommand {
 
     static final String TEAM_RENAME_COMMAND = "team_rename";
 
-    @SerializedName("teamUUID")
     private UUID teamUUID;
 
-    @SerializedName("oldDisplayName")
     private String oldDisplayName;
 
     @JsonCreator

@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import uk.gov.digital.ho.hocs.notify.api.NotifyService;
 
 import java.util.UUID;
@@ -16,18 +14,14 @@ import static uk.gov.digital.ho.hocs.notify.api.dto.TeamAssignChangeCommand.TEAM
 @Getter
 @JsonTypeName(TEAM_ASSIGN_CHANGE_COMMAND)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
 public class TeamAssignChangeCommand extends NotifyCommand {
 
     static final String TEAM_ASSIGN_CHANGE_COMMAND = "team_assign_change";
 
-    @SerializedName("caseReference")
     private String caseReference;
 
-    @SerializedName("teamUUID")
     private UUID teamUUID;
 
-    @SerializedName("allocationType")
     private String allocationType;
 
     @JsonCreator
