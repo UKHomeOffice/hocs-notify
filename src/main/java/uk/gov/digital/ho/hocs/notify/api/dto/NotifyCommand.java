@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.gson.annotations.SerializedName;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,19 +23,20 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = TeamRenameCommand.class),
         @JsonSubTypes.Type(value = UserAssignChangeCommand.class)
 })
+@Getter
 @NoArgsConstructor
 public abstract class NotifyCommand implements Command {
 
-    @Getter
+    @SerializedName("command")
     protected String command;
 
-    @Getter
+    @SerializedName("caseUUID")
     protected UUID caseUUID;
 
-    @Getter
+    @SerializedName("stageUUID")
     protected UUID stageUUID;
 
-    @Getter
+    @SerializedName("uuid")
     protected UUID uuid;
 
     @JsonCreator

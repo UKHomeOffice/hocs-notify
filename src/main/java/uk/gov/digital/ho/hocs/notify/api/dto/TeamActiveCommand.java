@@ -4,23 +4,27 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.digital.ho.hocs.notify.api.NotifyService;
 
 import java.util.UUID;
 
 @Getter
-@Slf4j
 @JsonTypeName(TeamActiveCommand.TEAM_ACTIVE_COMMAND)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@NoArgsConstructor
 public class TeamActiveCommand extends NotifyCommand {
 
     static final String TEAM_ACTIVE_COMMAND = "team_active";
 
-    private final UUID teamUUID;
-    private final Boolean currentActiveStatus;
+    @SerializedName("teamUUID")
+    private UUID teamUUID;
+
+    @SerializedName("currentActiveStatus")
+    private Boolean currentActiveStatus;
 
     @JsonCreator
     public TeamActiveCommand(@JsonProperty ( "teamUUID" ) @NonNull UUID teamUUID,
