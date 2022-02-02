@@ -36,7 +36,6 @@ steps:
       registry: quay.io
       repo: quay.io/ukhomeofficedigital/hocs-notify
       tags:
-        - build_${DRONE_BUILD_NUMBER}
         - ${DRONE_COMMIT_SHA}
         - branch-${DRONE_COMMIT_BRANCH/\//_}
     environment:
@@ -57,7 +56,6 @@ steps:
       registry: quay.io
       repo: quay.io/ukhomeofficedigital/hocs-notify
       tags:
-        - build_${DRONE_BUILD_NUMBER}
         - ${DRONE_COMMIT_SHA}
         - latest
     environment:
@@ -111,7 +109,7 @@ steps:
       KUBE_TOKEN:
         from_secret: hocs_notify_cs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
-      VERSION: build_${DRONE_BUILD_NUMBER}
+      VERSION: "${DRONE_COMMIT_SHA}"
     depends_on:
       - fetch and checkout
     when:
@@ -130,7 +128,7 @@ steps:
       KUBE_TOKEN:
         from_secret: hocs_notify_wcs_dev
       KUBE_SERVER: https://kube-api-notprod.notprod.acp.homeoffice.gov.uk
-      VERSION: build_${DRONE_BUILD_NUMBER}
+      VERSION: "${DRONE_COMMIT_SHA}"
     depends_on:
       - fetch and checkout
     when:
