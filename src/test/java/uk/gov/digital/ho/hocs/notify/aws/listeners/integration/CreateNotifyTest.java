@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
-public class CreateAuditTest extends BaseAwsSqsIntegrationTest {
+public class CreateNotifyTest extends BaseAwsSqsIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -34,7 +34,7 @@ public class CreateAuditTest extends BaseAwsSqsIntegrationTest {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
         String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
-        amazonSQSAsync.sendMessage(auditQueue, message);
+        amazonSQSAsync.sendMessage(notifyQueue, message);
 
         await().until(() -> getNumberOfMessagesOnQueue() == 0);
 
@@ -48,7 +48,7 @@ public class CreateAuditTest extends BaseAwsSqsIntegrationTest {
 
         doThrow(new NullPointerException("TEST")).when(notifyDomain).executeCommand(teamAssignChangeCommand);
 
-        amazonSQSAsync.sendMessage(auditQueue, message);
+        amazonSQSAsync.sendMessage(notifyQueue, message);
 
         await().until(() -> getNumberOfMessagesOnQueue() == 0);
         await().until(() -> getNumberOfMessagesNotVisibleOnQueue() == 1);

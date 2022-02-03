@@ -19,25 +19,25 @@ public class BaseAwsSqsIntegrationTest {
     @Autowired
     public AmazonSQSAsync amazonSQSAsync;
 
-    @Value("${aws.sqs.audit.url}")
-    public String auditQueue;
+    @Value("${aws.sqs.notify.url}")
+    public String notifyQueue;
 
     @Before
     public void setup() {
-        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(auditQueue));
+        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(notifyQueue));
     }
 
     @After
     public void teardown() {
-        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(auditQueue));
+        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(notifyQueue));
     }
 
     public int getNumberOfMessagesOnQueue() {
-        return getValueFromQueue(auditQueue, APPROXIMATE_NUMBER_OF_MESSAGES);
+        return getValueFromQueue(notifyQueue, APPROXIMATE_NUMBER_OF_MESSAGES);
     }
 
     public int getNumberOfMessagesNotVisibleOnQueue() {
-        return getValueFromQueue(auditQueue, APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE);
+        return getValueFromQueue(notifyQueue, APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE);
     }
 
     private int getValueFromQueue(String queue, String attribute) {

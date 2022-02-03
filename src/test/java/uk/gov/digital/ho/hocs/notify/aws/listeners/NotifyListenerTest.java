@@ -43,14 +43,14 @@ public class NotifyListenerTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void callsAuditServiceWithNullCreateCaseMessage() throws JsonProcessingException {
+    public void callsNotifyDomainWithNullCreateCaseMessage() throws JsonProcessingException {
         NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
 
         notifyListener.onNotifyEvent(null);
     }
 
     @Test(expected = EntityCreationException.class)
-    public void callsAuditServiceWithInvalidCreateCaseMessage() throws JsonProcessingException {
+    public void callsNotifyDomainWithInvalidCreateCaseMessage() throws JsonProcessingException {
         String incorrectMessage = "{test:1}";
         NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
 
