@@ -21,19 +21,15 @@ import java.util.UUID;
         @JsonSubTypes.Type(value = TeamRenameCommand.class),
         @JsonSubTypes.Type(value = UserAssignChangeCommand.class)
 })
-
+@Getter
 public abstract class NotifyCommand implements Command {
 
-    @Getter
     protected String command;
 
-    @Getter
     protected UUID caseUUID;
 
-    @Getter
     protected UUID stageUUID;
 
-    @Getter
     protected UUID uuid;
 
     @JsonCreator
