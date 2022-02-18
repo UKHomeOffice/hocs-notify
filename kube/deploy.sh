@@ -21,6 +21,8 @@ else
     export UPTIME_PERIOD="Mon-Fri 08:00-18:00 Europe/London"
 fi
 
+export KUBE_CERTIFICATE_AUTHORITY="https://raw.githubusercontent.com/UKHomeOffice/acp-ca/master/${CLUSTER_NAME}.crt"
+
 cd kd
 
 kd \
