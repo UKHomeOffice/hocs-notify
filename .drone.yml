@@ -22,7 +22,7 @@ steps:
   - name: build project
     image: quay.io/ukhomeofficedigital/hocs-base-image-build
     commands:
-      - ./gradlew clean assemble --no-daemon
+      - ./gradlew clean assemble
     depends_on:
       - setup localstack
 
@@ -36,7 +36,7 @@ steps:
       - NOTIFY_QUEUE_NAME='notify-queue'
       - NOTIFY_QUEUE_DLQ_NAME='notify-queue-dlq'
       - AWS_LOCAL_HOST='localstack'
-      - ./gradlew check --no-daemon
+      - ./gradlew check
     depends_on:
       - build project
 
