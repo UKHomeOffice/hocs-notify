@@ -19,13 +19,6 @@ steps:
     depends_on:
       - clone
 
-  - name: build project
-    image: quay.io/ukhomeofficedigital/hocs-base-image-build
-    commands:
-      - ./gradlew clean assemble
-    depends_on:
-      - setup localstack
-
   - name: test project
     image: quay.io/ukhomeofficedigital/hocs-base-image-build
     environment:
@@ -36,9 +29,9 @@ steps:
       - NOTIFY_QUEUE_NAME='notify-queue'
       - NOTIFY_QUEUE_DLQ_NAME='notify-queue-dlq'
       - AWS_LOCAL_HOST='localstack'
-      - ./gradlew check
+      - ./gradlew clean build --no-daemon
     depends_on:
-      - build project
+      - setup localstack
 
   - name: scan using sonar
     image: quay.io/ukhomeofficedigital/sonar-scanner
