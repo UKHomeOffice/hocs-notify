@@ -7,6 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -20,6 +21,20 @@ public class RequestData implements HandlerInterceptor {
 
     private static boolean isNullOrEmpty(String value) {
         return value == null || value.equals("");
+    }
+
+    public void parseMessageHeaders(Map<String,String> headers) {
+        if(headers.containsKey(CORRELATION_ID_HEADER)) {
+            MDC.put(CORRELATION_ID_HEADER, headers.get(CORRELATION_ID_HEADER));
+        }
+
+        if(headers.containsKey(USER_ID_HEADER)) {
+            MDC.put(USER_ID_HEADER, headers.get(USER_ID_HEADER));
+        }
+
+        if(headers.containsKey(GROUP_HEADER)) {
+            MDC.put(GROUP_HEADER, headers.get(GROUP_HEADER));
+        }
     }
 
     @Override

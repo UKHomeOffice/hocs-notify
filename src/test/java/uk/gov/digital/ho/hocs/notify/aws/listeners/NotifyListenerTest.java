@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.digital.ho.hocs.notify.api.dto.TeamAssignChangeCommand;
+import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
 import uk.gov.digital.ho.hocs.notify.domain.exception.EntityCreationException;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.Mockito.verify;
@@ -25,18 +27,20 @@ public class NotifyListenerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     @Mock
     private NotifyDomain notifyDomain;
+
+    @Mock
+    private RequestData requestData;
 
     @Test
     public void callsNotifyDomainWithValidNotifyCommand() throws JsonProcessingException {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
         String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
-        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain, requestData);
 
-        notifyListener.onNotifyEvent(message);
+        notifyListener.onNotifyEvent(message, Map.of());
 
         verify(notifyDomain).executeCommand(teamAssignChangeCommand);
         verifyNoMoreInteractions(notifyDomain);
@@ -44,17 +48,17 @@ public class NotifyListenerTest {
 
     @Test(expected = NullPointerException.class)
     public void callsNotifyDomainWithNullCreateCaseMessage() throws JsonProcessingException {
-        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain, requestData);
 
-        notifyListener.onNotifyEvent(null);
+        notifyListener.onNotifyEvent(null, Map.of());
     }
 
     @Test(expected = EntityCreationException.class)
     public void callsNotifyDomainWithInvalidCreateCaseMessage() throws JsonProcessingException {
         String incorrectMessage = "{test:1}";
-        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain);
+        NotifyListener notifyListener = new NotifyListener(objectMapper, notifyDomain, requestData);
 
-        notifyListener.onNotifyEvent(incorrectMessage);
+        notifyListener.onNotifyEvent(incorrectMessage, Map.of());
     }
 
 }
