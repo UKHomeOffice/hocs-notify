@@ -1,6 +1,6 @@
 package uk.gov.digital.ho.hocs.notify;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -27,11 +27,11 @@ public class RequestDataTest
     @Mock
     private Object mockHandler;
 
-    private RequestData requestData;
+    private RequestData requestData = new RequestData();
 
-    @BeforeEach
-    public void setup() {
-        requestData = new RequestData();
+    @AfterEach
+    public void after() {
+        requestData.clear();
     }
 
     @Test

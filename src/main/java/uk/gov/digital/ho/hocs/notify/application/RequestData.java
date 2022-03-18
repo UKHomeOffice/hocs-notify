@@ -17,8 +17,6 @@ public class RequestData implements HandlerInterceptor {
     static final String USER_ID_HEADER = "X-Auth-UserId";
     static final String GROUP_HEADER = "X-Auth-Groups";
 
-    private static final String ANONYMOUS = "anonymous";
-
     private static boolean isNullOrEmpty(String value) {
         return value == null || value.equals("");
     }
@@ -41,6 +39,7 @@ public class RequestData implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         MDC.clear();
         MDC.put(CORRELATION_ID_HEADER, initialiseCorrelationId(request));
+        MDC.put(USER_ID_HEADER, request.getHeader(USER_ID_HEADER));
         MDC.put(GROUP_HEADER, initialiseGroups(request));
 
         return true;
@@ -58,14 +57,8 @@ public class RequestData implements HandlerInterceptor {
         MDC.clear();
     }
 
-    private String initialiseCorrelationId(HttpServletRequest request) {
-        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
-        return !isNullOrEmpty(correlationId) ? correlationId : UUID.randomUUID().toString();
-    }
-
-    private String initialiseGroups(HttpServletRequest request) {
-        String groups = request.getHeader(GROUP_HEADER);
-        return !isNullOrEmpty(groups) ? groups : "/QU5PTllNT1VTCg==";
+    public void clear(){
+        MDC.clear();
     }
 
     public String correlationId() {
@@ -86,6 +79,16 @@ public class RequestData implements HandlerInterceptor {
 
     private String userId() {
         return MDC.get(USER_ID_HEADER);
+    }
+
+    private String initialiseCorrelationId(HttpServletRequest request) {
+        String correlationId = request.getHeader(CORRELATION_ID_HEADER);
+        return !isNullOrEmpty(correlationId) ? correlationId : UUID.randomUUID().toString();
+    }
+
+    private String initialiseGroups(HttpServletRequest request) {
+        String groups = request.getHeader(GROUP_HEADER);
+        return !isNullOrEmpty(groups) ? groups : "/QU5PTllNT1VTCg==";
     }
 
 }

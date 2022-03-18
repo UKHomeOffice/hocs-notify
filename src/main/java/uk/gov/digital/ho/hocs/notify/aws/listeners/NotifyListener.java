@@ -35,6 +35,7 @@ public class NotifyListener {
         requestData.parseMessageHeaders(headers);
         NotifyCommand command = objectMapper.readValue(message, NotifyCommand.class);
         notifyDomain.executeCommand(command);
+        requestData.clear();
     }
 
 }
