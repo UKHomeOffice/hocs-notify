@@ -81,11 +81,11 @@ class NotifyServiceTest {
         UUID currentUserUUID = null;
         UUID newUserUUID = UUID.fromString("11111111-0000-0000-0000-000000000000");
 
-        when(requestData.userIdUUID()).thenReturn(UUID.fromString("11111111-0000-0000-0000-000000000000"));
+        when(requestData.userId()).thenReturn(newUserUUID.toString());
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData).userIdUUID();
+        verify(requestData).userId();
 
         verifyNoInteractions(infoClient);
         verifyNoInteractions(notifyClient);
@@ -104,11 +104,11 @@ class NotifyServiceTest {
         personalisation.put("user", "name");
 
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
-        when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
+        when(requestData.userId()).thenReturn("22222222-0000-0000-0000-000000000000");
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData).userIdUUID();
+        verify(requestData).userId();
         verify(infoClient).getUser(newUserUUID);
         verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
 
@@ -167,11 +167,11 @@ class NotifyServiceTest {
         personalisation.put("user", "name");
 
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
-        when(requestData.userIdUUID()).thenReturn(UUID.fromString("11111111-0000-0000-0000-000000000000"));
+        when(requestData.userId()).thenReturn(newUserUUID.toString());
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData).userIdUUID();
+        verify(requestData).userId();
         verify(infoClient).getUser(currentUserUUID);
         verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.UNALLOCATE_INDIVIDUAL);
 
@@ -194,11 +194,11 @@ class NotifyServiceTest {
 
         when(infoClient.getUser(currentUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
         when(infoClient.getUser(newUserUUID)).thenReturn(new UserDto("any", "name", "any", "notify"));
-        when(requestData.userIdUUID()).thenReturn(UUID.fromString("22222222-0000-0000-0000-000000000000"));
+        when(requestData.userId()).thenReturn("22222222-0000-0000-0000-000000000000");
 
         notifyService.sendUserAssignChangeEmail(caseUUID, stageUUID, caseRef, currentUserUUID, newUserUUID);
 
-        verify(requestData).userIdUUID();
+        verify(requestData).userId();
         verify(infoClient).getUser(newUserUUID);
         verify(infoClient).getUser(currentUserUUID);
         verify(notifyClient).sendEmail(caseUUID, stageUUID, "notify", personalisation, NotifyType.ALLOCATE_INDIVIDUAL);
