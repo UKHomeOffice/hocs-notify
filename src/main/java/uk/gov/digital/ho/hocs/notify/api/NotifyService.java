@@ -82,13 +82,9 @@ public class NotifyService {
             if (newUserUUID != null) {
                 if (currentUserUUID != null && !newUserUUID.equals(currentUserUUID)) {
                     sendUnAllocateUserEmail(caseUUID, stageUUID, currentUserUUID, caseReference);
-                    if (!newUserUUID.equals(requestData.userIdUUID())) {
-                        sendAllocateUserEmail(caseUUID, stageUUID, newUserUUID, caseReference);
-                    }
-                } else {
-                    if (!newUserUUID.equals(requestData.userIdUUID())) {
-                        sendAllocateUserEmail(caseUUID, stageUUID, newUserUUID, caseReference);
-                    }
+                }
+                if (!newUserUUID.toString().equals(requestData.userId())) {
+                    sendAllocateUserEmail(caseUUID, stageUUID, newUserUUID, caseReference);
                 }
             } else if (currentUserUUID != null) {
                 sendUnAllocateUserEmail(caseUUID, stageUUID, currentUserUUID, caseReference);

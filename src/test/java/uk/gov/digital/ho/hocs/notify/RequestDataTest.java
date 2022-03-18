@@ -58,7 +58,7 @@ public class RequestDataTest
 
         requestData.preHandle(mockHttpServletRequest, mockHttpServletResponse, mockHandler);
 
-        assertThat(requestData.userIdUUID()).isEqualTo(userUUID);
+        assertThat(requestData.userId()).isEqualTo(userUUID.toString());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class RequestDataTest
 
         requestData.parseMessageHeaders(headers);
 
-        assertThat(requestData.userIdUUID()).isEqualTo(userId);
+        assertThat(requestData.userId()).isEqualTo(userId.toString());
     }
 
     @Test
@@ -100,7 +100,6 @@ public class RequestDataTest
 
     @Test
     public void shouldGetUserUUIDNull() {
-        // This used to throw a NPE
-        assertThat(requestData.userIdUUID()).isNull();
+        assertThat(requestData.userId()).isNull();
     }
 }

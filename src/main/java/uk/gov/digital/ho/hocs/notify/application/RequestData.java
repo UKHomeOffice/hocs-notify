@@ -79,14 +79,6 @@ public class RequestData implements HandlerInterceptor {
         return MDC.get(USER_ID_HEADER);
     }
 
-    public UUID userIdUUID() {
-        String userId = MDC.get(USER_ID_HEADER);
-        if(userId == null) {
-            return null;
-        }
-        return UUID.fromString(userId);
-    }
-
     public String groups() {
         return MDC.get(GROUP_HEADER);
     }
