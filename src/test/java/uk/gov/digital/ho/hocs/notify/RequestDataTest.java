@@ -10,6 +10,10 @@ import uk.gov.digital.ho.hocs.notify.application.RequestData;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
@@ -35,7 +39,6 @@ public class RequestDataTest
         requestData.preHandle(mockHttpServletRequest, mockHttpServletResponse, mockHandler);
 
         assertThat(requestData.correlationId()).isNotNull();
-        assertThat(requestData.userId()).isEqualTo("anonymous");
     }
 
     @Test
@@ -50,10 +53,54 @@ public class RequestDataTest
     @Test
     public void shouldUseUserIdFromRequest() {
         when(mockHttpServletRequest.getHeader("X-Correlation-Id")).thenReturn("some correlation id");
-        when(mockHttpServletRequest.getHeader("X-Auth-UserId")).thenReturn("some user id");
+        UUID userUUID = UUID.randomUUID();
+        when(mockHttpServletRequest.getHeader("X-Auth-UserId")).thenReturn(userUUID.toString());
 
         requestData.preHandle(mockHttpServletRequest, mockHttpServletResponse, mockHandler);
 
-        assertThat(requestData.userId()).isEqualTo("some user id");
+        assertThat(requestData.userIdUUID()).isEqualTo(userUUID);
+    }
+
+    @Test
+    public void shouldParseMessageHeadersFromMapUserId() {
+
+        Map<String,String> headers = new HashMap<>();
+        UUID userId = UUID.randomUUID();
+        headers.put("X-Auth-UserId", userId.toString());
+
+        requestData.parseMessageHeaders(headers);
+
+        assertThat(requestData.userIdUUID()).isEqualTo(userId);
+    }
+
+    @Test
+    public void shouldParseMessageHeadersFromMapCorrelation() {
+
+        Map<String,String> headers = new HashMap<>();
+        UUID correlationId = UUID.randomUUID();
+        headers.put("X-Correlation-Id", correlationId.toString());
+
+        requestData.parseMessageHeaders(headers);
+
+        assertThat(requestData.correlationId()).isEqualTo(correlationId.toString());
+    }
+
+    @Test
+    public void shouldParseMessageHeadersFromMapGroups() {
+
+        Map<String,String> headers = new HashMap<>();
+        String groups = "Some Groups";
+        headers.put("X-Auth-Groups", groups);
+
+        requestData.parseMessageHeaders(headers);
+
+        assertThat(requestData.groups()).isEqualTo(groups);
+    }
+
+
+    @Test
+    public void shouldGetUserUUIDNull() {
+        // This used to throw a NPE
+        assertThat(requestData.userIdUUID()).isNull();
     }
 }

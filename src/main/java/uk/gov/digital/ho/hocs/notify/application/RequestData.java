@@ -41,7 +41,6 @@ public class RequestData implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         MDC.clear();
         MDC.put(CORRELATION_ID_HEADER, initialiseCorrelationId(request));
-        MDC.put(USER_ID_HEADER, initialiseUserId(request));
         MDC.put(GROUP_HEADER, initialiseGroups(request));
 
         return true;
@@ -64,11 +63,6 @@ public class RequestData implements HandlerInterceptor {
         return !isNullOrEmpty(correlationId) ? correlationId : UUID.randomUUID().toString();
     }
 
-    private String initialiseUserId(HttpServletRequest request) {
-        String userId = request.getHeader(USER_ID_HEADER);
-        return !isNullOrEmpty(userId) ? userId : ANONYMOUS;
-    }
-
     private String initialiseGroups(HttpServletRequest request) {
         String groups = request.getHeader(GROUP_HEADER);
         return !isNullOrEmpty(groups) ? groups : "/QU5PTllNT1VTCg==";
@@ -78,16 +72,20 @@ public class RequestData implements HandlerInterceptor {
         return MDC.get(CORRELATION_ID_HEADER);
     }
 
-    public String userId() {
-        return MDC.get(USER_ID_HEADER);
-    }
-
     public UUID userIdUUID() {
-        return UUID.fromString(MDC.get(USER_ID_HEADER));
+        String userId = MDC.get(USER_ID_HEADER);
+        if(userId == null) {
+            return null;
+        }
+        return UUID.fromString(userId);
     }
 
     public String groups() {
         return MDC.get(GROUP_HEADER);
+    }
+
+    private String userId() {
+        return MDC.get(USER_ID_HEADER);
     }
 
 }
