@@ -25,7 +25,7 @@ steps:
       - clone
 
   - name: test project
-    image: quay.io/ukhomeofficedigital/hocs-base-image-build
+    image: quay.io/ukhomeofficedigital/hocs-base-image-build:1.0.2
     environment:
       DB_HOST: postgres
     commands:
@@ -165,7 +165,7 @@ steps:
       - ./config/localstack/setup-queues.sh
 
   - name: test project
-    image: quay.io/ukhomeofficedigital/hocs-base-image-build
+    image: quay.io/ukhomeofficedigital/hocs-base-image-build:1.0.2
     commands:
       - ./gradlew clean build --no-daemon
     depends_on:
