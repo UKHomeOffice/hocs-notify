@@ -11,14 +11,14 @@ trigger:
 
 services:
   - name: localstack
-    image: quay.io/ukhomeofficedigital/localstack
+    image: localstack/localstack:0.14.3
     environment:
       SERVICES: sqs
       DEFAULT_REGION: eu-west-2
 
 steps:
   - name: setup localstack
-    image: quay.io/ukhomeofficedigital/localstack
+    image: localstack/localstack:0.14.3
     commands:
       - ./config/localstack/setup-queues.sh
     depends_on:
@@ -153,14 +153,14 @@ trigger:
 
 services:
   - name: localstack
-    image: quay.io/ukhomeofficedigital/localstack
+    image: localstack/localstack:0.14.3
     environment:
       SERVICES: sqs
       DEFAULT_REGION: eu-west-2
 
 steps:
   - name: setup localstack
-    image: quay.io/ukhomeofficedigital/localstack
+    image: localstack/localstack:0.14.3
     commands:
       - ./config/localstack/setup-queues.sh
 
