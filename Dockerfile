@@ -1,6 +1,7 @@
 FROM quay.io/ukhomeofficedigital/hocs-base-image-build as builder
 
 COPY . .
+
 RUN ./gradlew clean assemble --no-daemon && java -Djarmode=layertools -jar ./build/libs/hocs-notify-service.jar extract
 
 FROM quay.io/ukhomeofficedigital/hocs-base-image
