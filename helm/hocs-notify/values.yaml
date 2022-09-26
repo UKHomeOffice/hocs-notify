@@ -1,8 +1,6 @@
 ---
 hocs-backend-service:
   nameOverride: hocs-notify
-  minReplicas: 1
-  maxReplicas: 1
 
   app:
     image:
