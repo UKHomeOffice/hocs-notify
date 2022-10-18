@@ -23,7 +23,7 @@ dependencies {
 
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.2'
 
-	implementation 'uk.gov.service.notify:notifications-java-client:3.18.0-RELEASE'
+	implementation 'uk.gov.service.notify:notifications-java-client:3.19.0-RELEASE'
 
 	compileOnly "org.projectlombok:lombok:${lombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
