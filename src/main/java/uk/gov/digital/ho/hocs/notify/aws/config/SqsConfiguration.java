@@ -5,12 +5,16 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
+import org.springframework.cloud.aws.messaging.config.SimpleMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
-import org.springframework.context.annotation.*;
+import org.springframework.cloud.aws.messaging.config.SimpleMessageListenerContainerFactory;
+import org.springframework.cloud.aws.messaging.config.annotation.EnableSqs;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
-@Import(SqsBootstrapConfiguration.class)
+@EnableSqs
 @Configuration
 @Profile({"sqs"})
 public class SqsConfiguration {
