@@ -2,7 +2,6 @@ package uk.gov.digital.ho.hocs.notify.aws.listeners;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
 import io.awspring.cloud.messaging.listener.annotation.SqsListener;
 import io.awspring.cloud.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.messaging.handler.annotation.Headers;

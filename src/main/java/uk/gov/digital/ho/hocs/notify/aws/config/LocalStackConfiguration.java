@@ -5,13 +5,16 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import io.awspring.cloud.messaging.config.annotation.EnableSqs;
 import org.springframework.beans.factory.annotation.Value;
 import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
+@EnableSqs
 @Configuration
 @Profile({"local"})
 public class LocalStackConfiguration {
