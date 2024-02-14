@@ -19,11 +19,16 @@ dependencies {
 	}
 	implementation 'org.springframework.boot:spring-boot-starter-undertow'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation group: 'io.awspring.cloud', name: 'spring-cloud-aws-messaging', version: '2.4.4'
-	implementation 'org.springframework:spring-messaging:5.3.24'
+//	implementation group: 'io.awspring.cloud', name: 'spring-cloud-aws-messaging', version: '2.4.4'
+	//implementation 'org.springframework:spring-messaging:5.3.24'
 	implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
+	implementation group: 'com.amazonaws', name: 'aws-java-sdk-sqs', version: '1.12.657'
 
-	implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
+	// https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter-sqs
+	implementation group: 'io.awspring.cloud', name: 'spring-cloud-aws-starter-sqs', version: '3.1.0'
+
+
+	//implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
 	implementation 'uk.gov.service.notify:notifications-java-client:4.1.0-RELEASE'
 

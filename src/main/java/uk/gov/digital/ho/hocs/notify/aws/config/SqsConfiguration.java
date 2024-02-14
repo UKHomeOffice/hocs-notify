@@ -5,15 +5,14 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import io.awspring.cloud.messaging.config.annotation.EnableSqs;
+import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.*;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
-
-@EnableSqs
-@EnableAutoConfiguration
+@Import(SqsBootstrapConfiguration.class)
+@Configuration
 @Profile({"sqs"})
 public class SqsConfiguration {
 
@@ -31,14 +30,27 @@ public class SqsConfiguration {
                 .build();
     }
 
-    @Primary
+//    @Primary
+//    @Bean
+//    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
+//        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
+//
+//        factory.setAmazonSqs(amazonSqs);
+//        factory.setMaxNumberOfMessages(10);
+//
+//        return factory;
+//    }
+
     @Bean
-    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
-        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
+    public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
+        return SqsMessageListenerContainerFactory
+                .builder()
+                .sqsAsyncClient(sqsAsyncClient())
+                .build();
+    }
 
-        factory.setAmazonSqs(amazonSqs);
-        factory.setMaxNumberOfMessages(10);
-
-        return factory;
+    @Bean
+    public SqsAsyncClient sqsAsyncClient() {
+        return SqsAsyncClient.builder().build();
     }
 }

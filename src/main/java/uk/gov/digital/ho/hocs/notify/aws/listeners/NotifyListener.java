@@ -2,8 +2,7 @@ package uk.gov.digital.ho.hocs.notify.aws.listeners;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.awspring.cloud.messaging.listener.annotation.SqsListener;
-import io.awspring.cloud.messaging.listener.SqsMessageDeletionPolicy;
+import io.awspring.cloud.sqs.annotation.SqsListener;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.notify.api.dto.NotifyCommand;
@@ -27,7 +26,7 @@ public class NotifyListener {
         this.requestData = requestData;
     }
 
-    @SqsListener(value = "${aws.sqs.notify.url}", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
+    @SqsListener(value = "${aws.sqs.notify.url}")
     public void onNotifyEvent(
             String message,
             @Headers Map<String,String> headers

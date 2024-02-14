@@ -5,16 +5,13 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import io.awspring.cloud.messaging.config.annotation.EnableSqs;
+import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
-@EnableSqs
+@Import(SqsBootstrapConfiguration.class)
 @Configuration
 @Profile({"local"})
 public class LocalStackConfiguration {
@@ -31,15 +28,29 @@ public class LocalStackConfiguration {
                 .build();
     }
 
+//    @Primary
+//    @Bean
+//    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
+//        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
+//
+//        factory.setAmazonSqs(amazonSqs);
+//        factory.setMaxNumberOfMessages(10);
+//
+//        return factory;
+//    }
+
     @Primary
     @Bean
-    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
-        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
+    public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
+        return SqsMessageListenerContainerFactory
+                .builder()
+                .sqsAsyncClient(sqsAsyncClient())
+                .build();
+    }
 
-        factory.setAmazonSqs(amazonSqs);
-        factory.setMaxNumberOfMessages(10);
-
-        return factory;
+    @Bean
+    public SqsAsyncClient sqsAsyncClient() {
+        return SqsAsyncClient.builder().build();
     }
 
 }
