@@ -30,17 +30,6 @@ public class SqsConfiguration {
                 .build();
     }
 
-//    @Primary
-//    @Bean
-//    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
-//        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
-//
-//        factory.setAmazonSqs(amazonSqs);
-//        factory.setMaxNumberOfMessages(10);
-//
-//        return factory;
-//    }
-
     @Bean
     public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
         return SqsMessageListenerContainerFactory
