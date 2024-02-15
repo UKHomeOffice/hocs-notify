@@ -28,17 +28,6 @@ public class LocalStackConfiguration {
                 .build();
     }
 
-//    @Primary
-//    @Bean
-//    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
-//        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
-//
-//        factory.setAmazonSqs(amazonSqs);
-//        factory.setMaxNumberOfMessages(10);
-//
-//        return factory;
-//    }
-
     @Primary
     @Bean
     public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {

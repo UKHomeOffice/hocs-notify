@@ -26,7 +26,7 @@ public class NotifyListener {
         this.requestData = requestData;
     }
 
-    @SqsListener(value = "${aws.sqs.notify.url}")
+    @SqsListener(value="${aws.sqs.notify.url}")
     public void onNotifyEvent(
             String message,
             @Headers Map<String,String> headers
