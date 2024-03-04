@@ -1,7 +1,9 @@
 package uk.gov.digital.ho.hocs.notify.aws.listeners.integration;
 
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.model.PurgeQueueRequest;
+import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.services.sqs.model.GetQueueAttributesRequest;
+import software.amazon.awssdk.services.sqs.model.PurgeQueueRequest;
+
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +19,19 @@ public class BaseAwsSqsIntegrationTest {
     private static final String APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE = "ApproximateNumberOfMessagesNotVisible";
 
     @Autowired
-    public AmazonSQSAsync amazonSQSAsync;
+    public  SqsClient sqsClient;
 
     @Value("${aws.sqs.notify.url}")
     public String notifyQueue;
 
     @Before
     public void setup() {
-        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(notifyQueue));
+        sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(notifyQueue).build());
     }
 
     @After
     public void teardown() {
-        amazonSQSAsync.purgeQueue(new PurgeQueueRequest(notifyQueue));
+        sqsClient.purgeQueue(PurgeQueueRequest.builder().queueUrl(notifyQueue).build());
     }
 
     public int getNumberOfMessagesOnQueue() {
@@ -41,10 +43,9 @@ public class BaseAwsSqsIntegrationTest {
     }
 
     private int getValueFromQueue(String queue, String attribute) {
-        var queueAttributes = amazonSQSAsync.getQueueAttributes(queue, List.of(attribute));
-        var messageCount = queueAttributes.getAttributes().get(attribute);
+        var queueAttributes = sqsClient.getQueueAttributes
+                (GetQueueAttributesRequest.builder().queueUrl(queue).attributeNamesWithStrings(attribute).build());
+        var messageCount = queueAttributes.attributes().get(attribute);
         return messageCount == null ? 0 : Integer.parseInt(messageCount);
     }
-
-
 }

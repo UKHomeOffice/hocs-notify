@@ -1,32 +1,33 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
-import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
-@Import(SqsBootstrapConfiguration.class)
+import org.springframework.context.annotation.*;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+import software.amazon.awssdk.services.sqs.SqsClient;
+
+import java.net.URI;
+
+import static software.amazon.awssdk.regions.Region.EU_WEST_2;
+
 @Configuration
 @Profile({"sqs"})
 public class SqsConfiguration {
 
     @Primary
     @Bean
-    public AmazonSQSAsync awsSqsClient(@Value("${aws.sqs.access.key}") String accessKey,
+    public SqsClient awsSqsClient(@Value("${aws.sqs.access.key}") String accessKey,
                                        @Value("${aws.sqs.secret.key}") String secretKey,
                                        @Value("${aws.sqs.region}") String region) {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+        AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
+        StaticCredentialsProvider staticCredentialsProvider = StaticCredentialsProvider.create(awsBasicCredentials);
 
-        return AmazonSQSAsyncClientBuilder
-                .standard()
-                .withRegion(region)
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+        return  SqsClient.builder()
+                .region(EU_WEST_2)
+                .credentialsProvider(staticCredentialsProvider)
                 .build();
     }
 

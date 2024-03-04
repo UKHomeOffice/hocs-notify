@@ -3,6 +3,7 @@ package uk.gov.digital.ho.hocs.notify.aws.listeners;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.awspring.cloud.sqs.annotation.SqsListener;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.stereotype.Service;
 import uk.gov.digital.ho.hocs.notify.api.dto.NotifyCommand;
@@ -12,6 +13,7 @@ import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 import java.util.Map;
 
 @Service
+@Configuration
 public class NotifyListener {
 
     private final ObjectMapper objectMapper;
@@ -26,7 +28,8 @@ public class NotifyListener {
         this.requestData = requestData;
     }
 
-    @SqsListener(value="${aws.sqs.notify.url}")
+    //@SqsListener(value = "${aws.sqs.notify.url}")
+    @SqsListener("http://localstack:4566/000000000000/notify-queue")
     public void onNotifyEvent(
             String message,
             @Headers Map<String,String> headers

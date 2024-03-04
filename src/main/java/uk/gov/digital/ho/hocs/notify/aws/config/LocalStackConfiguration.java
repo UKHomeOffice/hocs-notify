@@ -1,30 +1,34 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
-import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
+import lombok.SneakyThrows;
+import software.amazon.awssdk.auth.credentials.*;
+import software.amazon.awssdk.services.sqs.SqsClient;
+
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.acknowledgement.handler.AcknowledgementMode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
-@Import(SqsBootstrapConfiguration.class)
+import java.net.URI;
+
+import static software.amazon.awssdk.regions.Region.EU_WEST_2;
+
 @Configuration
 @Profile({"local"})
 public class LocalStackConfiguration {
 
+    @SneakyThrows
     @Primary
     @Bean
-    public AmazonSQSAsync awsSqsClient(
+    public SqsClient awsSqsClient(
             @Value("${aws.sqs.config.url}") String awsBaseUrl) {
-        return AmazonSQSAsyncClientBuilder
-                .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(
-                        new BasicAWSCredentials("test", "test")))
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsBaseUrl, "eu-west-2"))
+
+        return  SqsClient.builder()
+                .region(EU_WEST_2)
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create("test", "test")))
+                .endpointOverride(new URI(awsBaseUrl))
                 .build();
     }
 
@@ -34,6 +38,9 @@ public class LocalStackConfiguration {
         return SqsMessageListenerContainerFactory
                 .builder()
                 .sqsAsyncClient(sqsAsyncClient())
+                .configure(options -> options
+                        .acknowledgementMode(AcknowledgementMode.ON_SUCCESS)
+                )
                 .build();
     }
 
