@@ -9,14 +9,10 @@ import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ActiveProfiles;
-
-import java.util.List;
+import software.amazon.awssdk.services.sqs.model.QueueAttributeName;
 
 @ActiveProfiles("local")
 public class BaseAwsSqsIntegrationTest {
-
-    private static final String APPROXIMATE_NUMBER_OF_MESSAGES = "ApproximateNumberOfMessages";
-    private static final String APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE = "ApproximateNumberOfMessagesNotVisible";
 
     @Autowired
     public  SqsClient sqsClient;
@@ -35,16 +31,16 @@ public class BaseAwsSqsIntegrationTest {
     }
 
     public int getNumberOfMessagesOnQueue() {
-        return getValueFromQueue(notifyQueue, APPROXIMATE_NUMBER_OF_MESSAGES);
+        return getValueFromQueue(notifyQueue, QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES);
     }
 
     public int getNumberOfMessagesNotVisibleOnQueue() {
-        return getValueFromQueue(notifyQueue, APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE);
+        return getValueFromQueue(notifyQueue, QueueAttributeName.APPROXIMATE_NUMBER_OF_MESSAGES_NOT_VISIBLE);
     }
 
-    private int getValueFromQueue(String queue, String attribute) {
+    private int getValueFromQueue(String queue, QueueAttributeName attribute) {
         var queueAttributes = sqsClient.getQueueAttributes
-                (GetQueueAttributesRequest.builder().queueUrl(queue).attributeNamesWithStrings(attribute).build());
+                (GetQueueAttributesRequest.builder().queueUrl(queue).attributeNames(attribute).build());
         var messageCount = queueAttributes.attributes().get(attribute);
         return messageCount == null ? 0 : Integer.parseInt(messageCount);
     }
