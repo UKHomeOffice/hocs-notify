@@ -1,5 +1,6 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
+import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -8,8 +9,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 import software.amazon.awssdk.services.sqs.SqsClient;
-
-import java.net.URI;
 
 import static software.amazon.awssdk.regions.Region.EU_WEST_2;
 
@@ -20,18 +19,14 @@ public class SqsConfiguration {
     @Primary
     @Bean
     public SqsClient awsSqsClient(@Value("${aws.sqs.access.key}") String accessKey,
-                                       @Value("${aws.sqs.secret.key}") String secretKey,
-                                       @Value("${aws.sqs.region}") String region) {
-        AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
-        StaticCredentialsProvider staticCredentialsProvider = StaticCredentialsProvider.create(awsBasicCredentials);
-
+                                       @Value("${aws.sqs.secret.key}") String secretKey) {
         return  SqsClient.builder()
                 .region(EU_WEST_2)
-                .credentialsProvider(staticCredentialsProvider)
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
                 .build();
     }
 
-    @Bean
+/*    @Bean
     public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
         return SqsMessageListenerContainerFactory
                 .builder()
@@ -42,5 +37,5 @@ public class SqsConfiguration {
     @Bean
     public SqsAsyncClient sqsAsyncClient() {
         return SqsAsyncClient.builder().build();
-    }
+    }*/
 }

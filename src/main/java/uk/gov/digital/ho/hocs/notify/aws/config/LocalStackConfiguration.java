@@ -1,7 +1,9 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
+import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
 import lombok.SneakyThrows;
-import software.amazon.awssdk.auth.credentials.*;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.services.sqs.SqsClient;
 
 import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
@@ -30,23 +32,6 @@ public class LocalStackConfiguration {
                         AwsBasicCredentials.create("test", "test")))
                 .endpointOverride(new URI(awsBaseUrl))
                 .build();
-    }
-
-    @Primary
-    @Bean
-    public SqsMessageListenerContainerFactory<Object> defaultSqsListenerContainerFactory() {
-        return SqsMessageListenerContainerFactory
-                .builder()
-                .sqsAsyncClient(sqsAsyncClient())
-                .configure(options -> options
-                        .acknowledgementMode(AcknowledgementMode.ON_SUCCESS)
-                )
-                .build();
-    }
-
-    @Bean
-    public SqsAsyncClient sqsAsyncClient() {
-        return SqsAsyncClient.builder().build();
     }
 
 }

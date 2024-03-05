@@ -1,13 +1,21 @@
 localstack:
   host: localhost
 
+spring:
+  cloud:
+    aws:
+      sqs:
+        endpoint: http://localhost:4566
+        region: eu-west-2
+
 aws:
   sqs:
     config:
       port: 4566
-      url: http://${localstack.host}:${aws.sqs.config.port}
+      url: http://localhost:4566
     notify:
       url: ${aws.sqs.config.url}/000000000000/${aws.queue.notify.name}
 
 notify:
   apiKey: development__limited-1c9d8988-a0ee-4df8-aafb-b8f0aa2413e9-3061a68e-c44d-4896-94d5-8b51ef5a2b01
+
