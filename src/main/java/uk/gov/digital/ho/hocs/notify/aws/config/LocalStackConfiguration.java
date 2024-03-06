@@ -18,7 +18,7 @@ import static software.amazon.awssdk.regions.Region.EU_WEST_2;
 @Profile({"local"})
 public class LocalStackConfiguration {
 
-   /* @SneakyThrows
+   @SneakyThrows
     @Primary
     @Bean
     public SqsClient awsSqsClient(
@@ -30,9 +30,9 @@ public class LocalStackConfiguration {
                         AwsBasicCredentials.create("test", "test")))
                 .endpointOverride(new URI(awsBaseUrl))
                 .build();
-    }*/
+    }
 
-    @SneakyThrows
+    /*@SneakyThrows
     @Primary
     @Bean
     public SqsAsyncClient awsSqsClient(
@@ -44,6 +44,6 @@ public class LocalStackConfiguration {
                         AwsBasicCredentials.create("test", "test")))
                 .endpointOverride(new URI(awsBaseUrl))
                 .build();
-    }
+    }*/
 
 }
