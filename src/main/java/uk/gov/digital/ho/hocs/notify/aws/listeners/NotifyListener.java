@@ -28,8 +28,7 @@ public class NotifyListener {
         this.requestData = requestData;
     }
 
-   // @SqsListener("${aws.sqs.notify.url}")
-    @SqsListener(queueNames = "http://localhost:4566/000000000000/notify-queue")
+    @SqsListener("${aws.sqs.notify.url}")
     public void onNotifyEvent(
             String message,
             @Headers Map<String,String> headers

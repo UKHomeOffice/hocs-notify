@@ -1,13 +1,6 @@
 localstack:
   host: localhost
 
-spring:
-  cloud:
-    aws:
-      sqs:
-        endpoint: http://localhost:4566
-        region: eu-west-2
-
 aws:
   sqs:
     config:

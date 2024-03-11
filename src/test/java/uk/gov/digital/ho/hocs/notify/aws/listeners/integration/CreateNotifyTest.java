@@ -17,8 +17,7 @@ import java.util.UUID;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -38,8 +37,7 @@ public class CreateNotifyTest extends BaseAwsSqsIntegrationTest {
         sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(notifyQueue).messageBody(message).build());
 
         await().until(() -> getNumberOfMessagesOnQueue() == 0);
-
-        //verify(notifyDomain).executeCommand(any());
+        verify(notifyDomain, timeout(100)).executeCommand(any());
     }
 
     @Test

@@ -15,16 +15,10 @@ import java.net.URI;
 
 import static software.amazon.awssdk.regions.Region.EU_WEST_2;
 
-@Import(SqsBootstrapConfiguration.class)
 @Configuration
 @Profile({"sqs"})
 public class SqsConfiguration {
-
-    @Bean
-    public SqsTemplate sqsTemplate(SqsAsyncClient sqsAsyncClient) {
-        return SqsTemplate.builder().sqsAsyncClient(sqsAsyncClient).build();
-    }
-
+    
     @Bean
     public SqsAsyncClient sqsAsyncClient(@Value("${aws.sqs.access.key}") String accessKey,
                                          @Value("${aws.sqs.secret.key}") String secretKey) {
