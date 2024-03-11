@@ -5,7 +5,7 @@ aws:
   sqs:
     config:
       port: 4566
-      url: http://localhost:4566
+      url: http://${localstack.host}:${aws.sqs.config.port}
     notify:
       url: ${aws.sqs.config.url}/000000000000/${aws.queue.notify.name}
 
