@@ -1,42 +1,35 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.services.sqs.AmazonSQSAsyncClientBuilder;
+import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.operations.SqsTemplate;
+import lombok.SneakyThrows;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
+
 import org.springframework.beans.factory.annotation.Value;
-import io.awspring.cloud.messaging.config.SimpleMessageListenerContainerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
+
+import java.net.URI;
+
+import static software.amazon.awssdk.regions.Region.EU_WEST_2;
 
 @Configuration
 @Profile({"local"})
 public class LocalStackConfiguration {
 
-    @Primary
     @Bean
-    public AmazonSQSAsync awsSqsClient(
-            @Value("${aws.sqs.config.url}") String awsBaseUrl) {
-        return AmazonSQSAsyncClientBuilder
-                .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(
-                        new BasicAWSCredentials("test", "test")))
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(awsBaseUrl, "eu-west-2"))
+    public SqsAsyncClient sqsAsyncClient(@Value("${aws.sqs.config.url}") String awsBaseUrl) {
+        return SqsAsyncClient.builder()
+                .region(EU_WEST_2)
+                .credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create("test", "test")
+                ))
+                .endpointOverride(URI.create(awsBaseUrl))
                 .build();
-    }
-
-    @Primary
-    @Bean
-    public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSqs) {
-        SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
-
-        factory.setAmazonSqs(amazonSqs);
-        factory.setMaxNumberOfMessages(10);
-
-        return factory;
     }
 
 }

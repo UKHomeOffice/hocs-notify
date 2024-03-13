@@ -14,7 +14,8 @@ public class NotifyDomain {
     private final NotifyService notifyService;
 
     @Autowired
-    public NotifyDomain(NotifyService notifyService) {
+    public NotifyDomain(NotifyService notifyService)
+    {
         this.notifyService = notifyService;
     }
 

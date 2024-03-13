@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 import uk.gov.digital.ho.hocs.notify.api.dto.TeamAssignChangeCommand;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyDomain;
 import uk.gov.digital.ho.hocs.notify.domain.NotifyType;
@@ -16,8 +17,7 @@ import java.util.UUID;
 
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -34,11 +34,10 @@ public class CreateNotifyTest extends BaseAwsSqsIntegrationTest {
         TeamAssignChangeCommand teamAssignChangeCommand = new TeamAssignChangeCommand(UUID.randomUUID(), UUID.randomUUID(), "some ref", UUID.randomUUID(), NotifyType.ALLOCATE_PRIVATE_OFFICE.toString());
         String message = objectMapper.writeValueAsString(teamAssignChangeCommand);
 
-        amazonSQSAsync.sendMessage(notifyQueue, message);
+        sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(notifyQueue).messageBody(message).build());
 
         await().until(() -> getNumberOfMessagesOnQueue() == 0);
-
-        verify(notifyDomain).executeCommand(any());
+        verify(notifyDomain, timeout(100)).executeCommand(any());
     }
 
     @Test
@@ -48,7 +47,7 @@ public class CreateNotifyTest extends BaseAwsSqsIntegrationTest {
 
         doThrow(new NullPointerException("TEST")).when(notifyDomain).executeCommand(teamAssignChangeCommand);
 
-        amazonSQSAsync.sendMessage(notifyQueue, message);
+        sqsClient.sendMessage(SendMessageRequest.builder().queueUrl(notifyQueue).messageBody(message).build());
 
         await().until(() -> getNumberOfMessagesOnQueue() == 0);
         await().until(() -> getNumberOfMessagesNotVisibleOnQueue() == 1);
