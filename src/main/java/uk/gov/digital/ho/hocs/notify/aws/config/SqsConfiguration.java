@@ -21,7 +21,7 @@ public class SqsConfiguration {
                                          @Value("${aws.sqs.region}") Region region) {
 
         NettyNioAsyncHttpClient.Builder httpClient = NettyNioAsyncHttpClient.builder()
-                .connectionAcquisitionTimeout(Duration.ofSeconds(20));
+                .connectionTimeout(Duration.ofSeconds(120));
 
         return SqsAsyncClient.builder()
                 .region(region)
