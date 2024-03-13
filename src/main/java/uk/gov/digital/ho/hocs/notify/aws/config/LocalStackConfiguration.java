@@ -1,12 +1,7 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
-import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
-import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
-import io.awspring.cloud.sqs.operations.SqsTemplate;
-import lombok.SneakyThrows;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
@@ -15,16 +10,14 @@ import org.springframework.context.annotation.*;
 
 import java.net.URI;
 
-import static software.amazon.awssdk.regions.Region.EU_WEST_2;
-
 @Configuration
 @Profile({"local"})
 public class LocalStackConfiguration {
 
     @Bean
-    public SqsAsyncClient sqsAsyncClient(@Value("${aws.sqs.config.url}") String awsBaseUrl) {
+    public SqsAsyncClient sqsAsyncClient(@Value("${aws.sqs.config.url}") String awsBaseUrl, @Value("${aws.sqs.region}") Region region) {
         return SqsAsyncClient.builder()
-                .region(EU_WEST_2)
+                .region(region)
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create("test", "test")
                 ))

@@ -1,32 +1,34 @@
 package uk.gov.digital.ho.hocs.notify.aws.config;
 
-import io.awspring.cloud.sqs.config.SqsBootstrapConfiguration;
-import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
-import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.context.annotation.*;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-import software.amazon.awssdk.services.sqs.SqsClient;
+import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 
-import java.net.URI;
-
-import static software.amazon.awssdk.regions.Region.EU_WEST_2;
+import java.time.Duration;
 
 @Configuration
 @Profile({"sqs"})
 public class SqsConfiguration {
-    
+
     @Bean
     public SqsAsyncClient sqsAsyncClient(@Value("${aws.sqs.access.key}") String accessKey,
-                                         @Value("${aws.sqs.secret.key}") String secretKey) {
+                                         @Value("${aws.sqs.secret.key}") String secretKey,
+                                         @Value("${aws.sqs.region}") Region region) {
+
+        NettyNioAsyncHttpClient.Builder httpClient = NettyNioAsyncHttpClient.builder()
+                .connectionTimeout(Duration.ofSeconds(120));
+
         return SqsAsyncClient.builder()
-                .region(EU_WEST_2)
+                .region(region)
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ))
+                .httpClientBuilder(httpClient)
                 .build();
     }
 
