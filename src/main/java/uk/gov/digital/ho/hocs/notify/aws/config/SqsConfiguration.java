@@ -7,7 +7,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;
-import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 
 import java.time.Duration;
 
@@ -20,15 +19,11 @@ public class SqsConfiguration {
                                          @Value("${aws.sqs.secret.key}") String secretKey,
                                          @Value("${aws.sqs.region}") Region region) {
 
-        NettyNioAsyncHttpClient.Builder httpClient = NettyNioAsyncHttpClient.builder()
-                .connectionTimeout(Duration.ofSeconds(120));
-
         return SqsAsyncClient.builder()
                 .region(region)
                 .credentialsProvider(StaticCredentialsProvider.create(
                         AwsBasicCredentials.create(accessKey, secretKey)
                 ))
-                .httpClientBuilder(httpClient)
                 .build();
     }
 
